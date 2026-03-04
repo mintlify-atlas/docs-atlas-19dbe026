@@ -23,7 +23,7 @@ Before installing, ensure you have:
     ```
 
     The CLI will guide you through:
-    - Framework selection (React, Vue, Svelte, Astro)
+    - Framework selection (React, Vue, Astro, Solid)
     - Additional integrations (TailwindCSS, TanStack, etc.)
     - Automatic dependency installation
   </Tab>
@@ -145,22 +145,6 @@ Install additional peer dependencies based on your framework:
 
     export default zayne({
       vue: true,
-    });
-    ```
-  </Accordion>
-
-  <Accordion title="Svelte">
-    ```bash
-    pnpm add -D eslint-plugin-svelte
-    ```
-
-    Enable in your config:
-
-    ```javascript
-    import { zayne } from "@zayne-labs/eslint-config";
-
-    export default zayne({
-      svelte: true,
     });
     ```
   </Accordion>
@@ -468,8 +452,8 @@ The ESLint config includes an interactive CLI that simplifies setup:
     Choose from:
     - React
     - Vue
-    - Svelte
     - Astro
+    - Solid
     - None (base configuration)
   </Step>
 
@@ -537,7 +521,7 @@ After installation, verify your setup:
     Customize rules and advanced configuration options
   </Card>
   <Card title="Framework Support" icon="code" href="/guides/eslint-frameworks">
-    Configure ESLint for React, Vue, Svelte, and more
+    Configure ESLint for React, Vue, Astro, Solid, and more
   </Card>
   <Card title="Prettier Setup" icon="paintbrush" href="/guides/prettier-setup">
     Configure Prettier with smart import sorting

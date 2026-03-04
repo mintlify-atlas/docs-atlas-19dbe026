@@ -1,0 +1,90 @@
+{
+  "projectType": "sdk-library",
+  "projectName": "Zayne Labs Config",
+  "projectDescription": "Shared configuration presets for ESLint, Prettier, and TypeScript used across Zayne Labs projects.",
+  "theme": "mint",
+  "primaryColor": "#94cb04",
+  "lightColor": "#545454",
+  "darkColor": null,
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "installation"
+            ]
+          },
+          {
+            "group": "Packages",
+            "pages": [
+              "packages/overview",
+              "packages/eslint-config",
+              "packages/prettier-config",
+              "packages/tsconfig"
+            ]
+          },
+          {
+            "group": "Guides",
+            "pages": [
+              "guides/eslint-setup",
+              "guides/eslint-customization",
+              "guides/eslint-frameworks",
+              "guides/prettier-setup",
+              "guides/tsconfig-setup"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "groups": [
+          {
+            "group": "ESLint Config",
+            "pages": [
+              "api/eslint/factory",
+              "api/eslint/configs",
+              "api/eslint/cli"
+            ]
+          },
+          {
+            "group": "Prettier Config",
+            "pages": [
+              "api/prettier/factory",
+              "api/prettier/options"
+            ]
+          },
+          {
+            "group": "TypeScript Config",
+            "pages": [
+              "api/tsconfig/presets"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Zero-config ESLint setup with framework support (React, Vue, Svelte, Astro, Solid)",
+    "Modular Prettier configuration with automatic plugin detection and smart import sorting",
+    "TypeScript config presets for apps and libraries with bundler and tsc modes",
+    "Interactive CLI for guided setup",
+    "Flat config architecture for easy composition",
+    "Auto-installation of optional peer dependencies"
+  ],
+  "publicApiSurface": [
+    "@zayne-labs/eslint-config: zayne() factory function",
+    "@zayne-labs/eslint-config: Individual config exports (javascript, typescript, react, vue, etc.)",
+    "@zayne-labs/eslint-config: CLI command via npx/pnpx",
+    "@zayne-labs/prettier-config: zayne() factory function",
+    "@zayne-labs/prettier-config: Plugin exports (sortImports, tailwindcss, astro)",
+    "@zayne-labs/tsconfig: bundler/dom/app preset",
+    "@zayne-labs/tsconfig: bundler/no-dom/app preset",
+    "@zayne-labs/tsconfig: tsc/dom/app preset",
+    "@zayne-labs/tsconfig: tsc/no-dom/app preset",
+    "@zayne-labs/tsconfig: Library and monorepo variants"
+  ]
+}

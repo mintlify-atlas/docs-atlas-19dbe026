@@ -1,0 +1,236 @@
+---
+title: Packages Overview
+description: Comprehensive toolkit for consistent code quality across JavaScript and TypeScript projects
+---
+
+Zayne Labs Config provides three complementary packages that work together to establish consistent code quality, formatting, and type-checking standards across your projects.
+
+## Package Suite
+
+<CardGroup cols={3}>
+  <Card title="ESLint Config" icon="shield-check" href="/packages/eslint-config">
+    Opinionated ESLint configuration with framework support and zero-config setup
+  </Card>
+  <Card title="Prettier Config" icon="brush" href="/packages/prettier-config">
+    Modular Prettier configuration with smart import sorting and Tailwind support
+  </Card>
+  <Card title="TSConfig" icon="code" href="/packages/tsconfig">
+    TypeScript configuration presets for apps, libraries, and monorepos
+  </Card>
+</CardGroup>
+
+## Comparison
+
+<table>
+  <thead>
+    <tr>
+      <th>Feature</th>
+      <th>ESLint Config</th>
+      <th>Prettier Config</th>
+      <th>TSConfig</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>**Purpose**</td>
+      <td>Code quality & best practices</td>
+      <td>Code formatting & style</td>
+      <td>TypeScript compiler settings</td>
+    </tr>
+    <tr>
+      <td>**Setup Complexity**</td>
+      <td>One-line or interactive CLI</td>
+      <td>One-line factory function</td>
+      <td>Single extend reference</td>
+    </tr>
+    <tr>
+      <td>**Framework Support**</td>
+      <td>React, Vue, Svelte, Astro, Solid</td>
+      <td>Astro</td>
+      <td>Next.js</td>
+    </tr>
+    <tr>
+      <td>**Customization**</td>
+      <td>Highly configurable options</td>
+      <td>Modular factory system</td>
+      <td>Extend and override</td>
+    </tr>
+    <tr>
+      <td>**Node Version**</td>
+      <td>Node.js v20+</td>
+      <td>Node.js v18+</td>
+      <td>Any</td>
+    </tr>
+    <tr>
+      <td>**Config Format**</td>
+      <td>ESLint Flat Config</td>
+      <td>Prettier v3</td>
+      <td>JSON extends</td>
+    </tr>
+  </tbody>
+</table>
+
+## Quick Start
+
+### All Packages
+
+```bash
+pnpm add -D @zayne-labs/eslint-config @zayne-labs/prettier-config @zayne-labs/tsconfig
+```
+
+### ESLint Setup
+
+```js title="eslint.config.js"
+import { zayne } from "@zayne-labs/eslint-config";
+
+export default zayne();
+```
+
+### Prettier Setup
+
+```js title="prettier.config.js"
+import { zayne } from "@zayne-labs/prettier-config";
+
+export default zayne();
+```
+
+### TypeScript Setup
+
+```json title="tsconfig.json"
+{
+  "extends": "@zayne-labs/tsconfig/bundler/dom/app"
+}
+```
+
+## Why Use These Packages Together?
+
+<AccordionGroup>
+  <Accordion title="Consistent Code Quality">
+    ESLint enforces best practices and catches bugs, Prettier ensures uniform formatting, and TSConfig provides type safety—all working in harmony.
+  </Accordion>
+  
+  <Accordion title="Zero Config to Fully Custom">
+    Start with sensible defaults and customize only what you need. Each package offers granular control when required.
+  </Accordion>
+  
+  <Accordion title="Framework Agnostic">
+    Whether you're building with React, Vue, Svelte, or vanilla TypeScript, these packages adapt to your stack.
+  </Accordion>
+  
+  <Accordion title="Modern Standards">
+    Built for ESLint v9+ Flat Config, Prettier v3, and modern TypeScript features.
+  </Accordion>
+</AccordionGroup>
+
+## Package Details
+
+### @zayne-labs/eslint-config
+
+**Latest Version:** 0.11.30
+
+**Key Features:**
+- Interactive CLI for guided setup
+- Support for TypeScript, JSX, Vue, JSON, YAML, TOML, Markdown
+- Framework plugins: React, Vue, Svelte, Astro, Solid
+- Respects `.gitignore` by default
+- Type-aware linting rules
+
+[View ESLint Config Documentation →](/packages/eslint-config)
+
+### @zayne-labs/prettier-config
+
+**Latest Version:** 0.11.30
+
+**Key Features:**
+- Modular factory for selective feature enabling
+- Smart import sorting by "distance"
+- Tailwind CSS v4 support with class sorting
+- Auto-installation of optional plugins
+- Deduplicated configuration merging
+
+[View Prettier Config Documentation →](/packages/prettier-config)
+
+### @zayne-labs/tsconfig
+
+**Latest Version:** 0.11.30
+
+**Key Features:**
+- Presets for apps, libraries, and monorepos
+- Separate configs for DOM and non-DOM environments
+- TSC and bundler variants
+- Based on Matt Pocock's TSConfig Cheat Sheet
+- Next.js-specific configuration
+
+[View TSConfig Documentation →](/packages/tsconfig)
+
+## Integration Example
+
+Here's a complete setup for a React TypeScript application:
+
+```json title="package.json"
+{
+  "scripts": {
+    "lint:eslint": "eslint .",
+    "lint:eslint-fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "type-check": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@zayne-labs/eslint-config": "^0.11.30",
+    "@zayne-labs/prettier-config": "^0.11.30",
+    "@zayne-labs/tsconfig": "^0.11.30",
+    "eslint": "^9.5.0",
+    "prettier": "^3.0.0",
+    "typescript": "^5.0.0"
+  }
+}
+```
+
+```js title="eslint.config.js"
+import { zayne } from "@zayne-labs/eslint-config";
+
+export default zayne({
+  react: true,
+  typescript: true,
+  stylistic: true,
+});
+```
+
+```js title="prettier.config.js"
+import { zayne } from "@zayne-labs/prettier-config";
+
+export default zayne({
+  sortImports: true,
+  tailwindcss: true,
+});
+```
+
+```json title="tsconfig.json"
+{
+  "extends": "@zayne-labs/tsconfig/bundler/dom/app",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["src"]
+}
+```
+
+## Support & Contributing
+
+All three packages are open source and maintained by Zayne Labs.
+
+<CardGroup cols={2}>
+  <Card title="Report Issues" icon="github" href="https://github.com/zayne-labs/config/issues">
+    Found a bug or have a feature request?
+  </Card>
+  <Card title="View Source" icon="code" href="https://github.com/zayne-labs/config">
+    Explore the codebase and contribute
+  </Card>
+</CardGroup>
+
+<Note>
+  These packages follow semantic versioning with config-specific considerations. Rule changes are considered non-breaking, while changes to setup or major behavior are breaking changes.
+</Note>

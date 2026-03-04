@@ -1,0 +1,344 @@
+---
+title: Configuration Options
+description: Detailed options for base, sortImports, tailwindcss, and astro configurations
+---
+
+The `zayne()` factory accepts an options object with four main feature flags, each supporting boolean or detailed configuration.
+
+## Base Options
+
+<ParamField path="base" type="boolean | Config" default="true">
+  Opinionated base Prettier configuration with refined defaults.
+
+  When `true`, applies these defaults:
+
+  ```typescript
+  {
+    experimentalOperatorPosition: "start",
+    experimentalTernaries: true,
+    jsxSingleQuote: false,
+    printWidth: 107,
+    singleQuote: false,
+    tabWidth: 3,
+    trailingComma: "es5",
+    useTabs: true,
+  }
+  ```
+
+  Pass a `Config` object to override specific values:
+
+  ```typescript
+  zayne({
+    base: {
+      printWidth: 120,
+      useTabs: false,
+    },
+  });
+  ```
+</ParamField>
+
+## Sort Imports Options
+
+<ParamField path="sortImports" type="boolean | OptionsSortImports" default="true">
+  Enables `@ianvs/prettier-plugin-sort-imports` with distance-based import organization.
+
+  <Expandable title="OptionsSortImports properties">
+    <ParamField path="importOrder" type="string[]">
+      Regex patterns to control import grouping and order. Supports special keywords:
+      - `<BUILTIN_MODULES>`: Node.js built-ins
+      - `<THIRD_PARTY_MODULES>`: npm packages
+      - `<TYPES>`: Type-only imports
+      
+      Use empty strings (`""`) to add blank lines between groups.
+
+      **Default:**
+      ```typescript
+      [
+        "^https?://",           // URLs
+        "<BUILTIN_MODULES>",    // node:fs, etc.
+        "^(bun|jsr|npm):",      // Protocol imports
+        "<THIRD_PARTY_MODULES>",// react, lodash, etc.
+        "^(@@?/|[#$%~])",       // Aliases
+        "^(?!.*[.]css$)[./].*$",// Relative paths (no CSS)
+        ".css$"                 // CSS files last
+      ]
+      ```
+
+      **Example:**
+      ```typescript
+      zayne({
+        sortImports: {
+          importOrder: [
+            "^@company/core",
+            "^@company/",
+            "<THIRD_PARTY_MODULES>",
+          ],
+        },
+      });
+      ```
+    </ParamField>
+
+    <ParamField path="importOrderCaseSensitive" type="boolean" default="false">
+      Enable case-sensitive sorting within import groups.
+
+      ```typescript
+      zayne({
+        sortImports: {
+          importOrderCaseSensitive: true,
+        },
+      });
+      ```
+    </ParamField>
+
+    <ParamField path="importOrderParserPlugins" type="string[]" default='["typescript", "jsx"]'>
+      Babel parser plugins to understand file syntax. Pass plugin options as JSON strings.
+
+      ```typescript
+      zayne({
+        sortImports: {
+          importOrderParserPlugins: [
+            "typescript",
+            "jsx",
+            "decorators",
+            '{"decoratorsBeforeExport": true}',
+          ],
+        },
+      });
+      ```
+    </ParamField>
+
+    <ParamField path="importOrderSafeSideEffects" type="string[]" default='[".css$"]'>
+      Regex patterns for side-effect imports that are safe to reorder. By default, side-effect imports stay in place.
+
+      ```typescript
+      zayne({
+        sortImports: {
+          importOrderSafeSideEffects: [".css$", ".scss$", "^polyfills"],
+        },
+      });
+      ```
+    </ParamField>
+
+    <ParamField path="importOrderTypeScriptVersion" type="string" default='"5.9.3"'>
+      TypeScript version to enable modern syntax features like mixed type/value imports.
+    </ParamField>
+
+    <ParamField path="plugins" type="Array<string | Plugin | URL>">
+      Additional plugins to include alongside `@ianvs/prettier-plugin-sort-imports`.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+## Tailwind CSS Options
+
+<ParamField path="tailwindcss" type="boolean | OptionsTailwindCss" default="false">
+  Enables Tailwind CSS class sorting via merged plugins. Requires:
+  - `prettier-plugin-tailwindcss`
+  - `prettier-plugin-classnames`
+  - `prettier-plugin-merge`
+
+  <Expandable title="OptionsTailwindCss properties">
+    <ParamField path="customAttributes" type="string[]">
+      Additional attributes to sort classes in (beyond `class` and `className`).
+
+      **Default:** `["className", "classNames", "classes"]`
+
+      ```typescript
+      zayne({
+        tailwindcss: {
+          customAttributes: ["containerClass", "wrapperClass"],
+        },
+      });
+      ```
+    </ParamField>
+
+    <ParamField path="customFunctions" type="string[]">
+      Functions or tagged templates to sort classes in.
+
+      **Default:** `["cnMerge", "cnJoin", "cn", "tv", "tw"]`
+
+      ```typescript
+      zayne({
+        tailwindcss: {
+          customFunctions: ["clsx", "cva"],
+        },
+      });
+      ```
+    </ParamField>
+
+    <ParamField path="endPosition" type='"absolute" | "relative"' default='"absolute"'>
+      Criterion for ending class names on each line when wrapping to multi-line.
+    </ParamField>
+
+    <ParamField path="syntaxTransformation" type="boolean" default="false">
+      Transforms non-expression class names into expression syntax if line wrapping occurs.
+      
+      <Warning>
+        This transformation is not reversible.
+      </Warning>
+    </ParamField>
+
+    <ParamField path="tailwindAttributes" type="string[]">
+      Attributes to sort classes in. Supports regex patterns.
+
+      **Default:** `["className", "classNames", "classes"]`
+
+      ```typescript
+      zayne({
+        tailwindcss: {
+          tailwindAttributes: ["class", "className", ".*Class.*"],
+        },
+      });
+      ```
+    </ParamField>
+
+    <ParamField path="tailwindConfig" type="string">
+      Path to Tailwind config file (v3).
+
+      ```typescript
+      zayne({
+        tailwindcss: {
+          tailwindConfig: "./tailwind.config.js",
+        },
+      });
+      ```
+    </ParamField>
+
+    <ParamField path="tailwindFunctions" type="string[]">
+      Functions or tagged templates to sort classes in. Supports regex patterns.
+
+      **Default:** `["cnMerge", "cnJoin", "cn", "tv", "tw"]`
+
+      ```typescript
+      zayne({
+        tailwindcss: {
+          tailwindFunctions: ["cn", "cva", ".*Classes"],
+        },
+      });
+      ```
+    </ParamField>
+
+    <ParamField path="tailwindPreserveDuplicates" type="boolean" default="false">
+      Prevent automatic removal of duplicate classes.
+    </ParamField>
+
+    <ParamField path="tailwindPreserveWhitespace" type="boolean" default="false">
+      Prevent automatic removal of unnecessary whitespace.
+    </ParamField>
+
+    <ParamField path="tailwindStylesheet" type="string" default='"./tailwind.css"'>
+      Path to CSS entry point (Tailwind CSS v4+).
+
+      ```typescript
+      zayne({
+        tailwindcss: {
+          tailwindStylesheet: "./src/styles/tailwind.css",
+        },
+      });
+      ```
+    </ParamField>
+
+    <ParamField path="plugins" type="Array<string | Plugin | URL>">
+      Custom plugins to include. The merge plugin is always added last automatically.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+## Astro Options
+
+<ParamField path="astro" type="boolean | OptionsAstro" default="false">
+  Enables `prettier-plugin-astro` for formatting `.astro` files.
+
+  <Expandable title="OptionsAstro properties">
+    <ParamField path="astroAllowShorthand" type="boolean" default="false">
+      Enable automatic formatting of attributes to shorthand form.
+
+      ```typescript
+      zayne({
+        astro: {
+          astroAllowShorthand: true,
+        },
+      });
+      ```
+
+      **Example transformation:**
+      ```astro
+      <!-- Before -->
+      <Component name={name} />
+      
+      <!-- After -->
+      <Component {name} />
+      ```
+    </ParamField>
+
+    <ParamField path="astroSkipFrontmatter" type="boolean" default="false">
+      Skip formatting of JavaScript frontmatter in `.astro` files.
+
+      ```typescript
+      zayne({
+        astro: {
+          astroSkipFrontmatter: true,
+        },
+      });
+      ```
+    </ParamField>
+
+    <ParamField path="overrides" type="Array<Override>">
+      Parser overrides for specific file patterns. The `*.astro` override is automatically included.
+
+      ```typescript
+      zayne({
+        astro: {
+          overrides: [
+            {
+              files: "*.astro",
+              options: { parser: "astro" },
+            },
+          ],
+        },
+      });
+      ```
+    </ParamField>
+
+    <ParamField path="plugins" type="Array<string | Plugin | URL>">
+      Additional plugins to include alongside `prettier-plugin-astro`.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+## Complete Example
+
+```typescript
+import { zayne } from "@zayne-labs/prettier-config";
+
+export default zayne(
+  {
+    base: {
+      printWidth: 100,
+      useTabs: false,
+    },
+    sortImports: {
+      importOrder: [
+        "^@company/core",
+        "^@company/",
+        "<THIRD_PARTY_MODULES>",
+        "^@/",
+        "^[./]",
+      ],
+      importOrderCaseSensitive: true,
+    },
+    tailwindcss: {
+      tailwindStylesheet: "./src/styles/globals.css",
+      customFunctions: ["cn", "clsx", "cva"],
+      customAttributes: ["containerClass"],
+    },
+    astro: {
+      astroAllowShorthand: true,
+    },
+  },
+  {
+    // Additional custom config
+    semi: false,
+  }
+);
+```

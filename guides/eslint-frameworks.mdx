@@ -1,0 +1,444 @@
+---
+title: 'Framework Support'
+description: 'Configure ESLint for React, Vue, Svelte, Astro, Solid, Next.js, and Expo projects'
+---
+
+## Overview
+
+`@zayne-labs/eslint-config` provides first-class support for popular JavaScript frameworks. This guide covers how to enable and configure framework-specific linting rules.
+
+## React
+
+React support is auto-detected in most cases, but you can enable it explicitly.
+
+<Steps>
+  <Step title="Enable React support">
+    ```js eslint.config.js
+    import { zayne } from "@zayne-labs/eslint-config";
+
+    export default zayne({
+      react: true,
+    });
+    ```
+  </Step>
+
+  <Step title="Install peer dependencies">
+    ESLint will prompt you to install these dependencies when you run it:
+
+    ```bash
+    pnpm i -D @eslint-react/eslint-plugin eslint-plugin-react-hooks eslint-plugin-react-refresh
+    ```
+  </Step>
+
+  <Step title="Start linting">
+    Your React project is now configured with ESLint rules for:
+    - React best practices
+    - Hooks rules
+    - React Refresh/Fast Refresh compatibility
+  </Step>
+</Steps>
+
+### Next.js
+
+For Next.js projects, use the dedicated configuration:
+
+```js eslint.config.js
+import { zayne } from "@zayne-labs/eslint-config";
+
+export default zayne({
+  react: true,
+  // Add Next.js specific rules as needed
+});
+```
+
+<Note>
+  Next.js automatically detects React, so you may not need to explicitly enable it.
+</Note>
+
+### Expo (React Native)
+
+For React Native and Expo projects:
+
+<Steps>
+  <Step title="Enable Expo support">
+    ```js eslint.config.js
+    import { zayne } from "@zayne-labs/eslint-config";
+
+    export default zayne({
+      expo: true,
+    });
+    ```
+  </Step>
+
+  <Step title="Install peer dependencies">
+    ```bash
+    pnpm i -D eslint-config-expo
+    ```
+  </Step>
+</Steps>
+
+## Vue
+
+Vue support includes Vue 3 template linting and composition API rules.
+
+<Steps>
+  <Step title="Enable Vue support">
+    ```js eslint.config.js
+    import { zayne } from "@zayne-labs/eslint-config";
+
+    export default zayne({
+      vue: true,
+    });
+    ```
+  </Step>
+
+  <Step title="Install peer dependencies">
+    ```bash
+    pnpm i -D eslint-plugin-vue vue-eslint-parser
+    ```
+  </Step>
+</Steps>
+
+### Vue Configuration Options
+
+Customize Vue linting behavior:
+
+```js eslint.config.js
+import { zayne } from "@zayne-labs/eslint-config";
+
+export default zayne(
+  {
+    vue: true,
+  },
+  // Override Vue-specific rules
+  {
+    files: ["**/*.vue"],
+    rules: {
+      "vue/multi-word-component-names": "off",
+      "vue/require-default-prop": "warn",
+    },
+  }
+);
+```
+
+## Svelte
+
+Svelte support includes Svelte 4+ template linting.
+
+<Steps>
+  <Step title="Enable Svelte support">
+    ```js eslint.config.js
+    import { zayne } from "@zayne-labs/eslint-config";
+
+    export default zayne({
+      svelte: true,
+    });
+    ```
+  </Step>
+
+  <Step title="Install peer dependencies">
+    ```bash
+    pnpm i -D eslint-plugin-svelte
+    ```
+  </Step>
+</Steps>
+
+### SvelteKit Integration
+
+For SvelteKit projects, the configuration works automatically:
+
+```js eslint.config.js
+import { zayne } from "@zayne-labs/eslint-config";
+
+export default zayne({
+  svelte: true,
+  typescript: true, // SvelteKit uses TypeScript
+});
+```
+
+## Astro
+
+Astro support includes Astro component linting and framework integration.
+
+<Steps>
+  <Step title="Enable Astro support">
+    ```js eslint.config.js
+    import { zayne } from "@zayne-labs/eslint-config";
+
+    export default zayne({
+      astro: true,
+    });
+    ```
+  </Step>
+
+  <Step title="Install peer dependencies">
+    ```bash
+    pnpm i -D eslint-plugin-astro
+    ```
+  </Step>
+</Steps>
+
+### Astro with React/Vue/Svelte
+
+Astro supports multiple frameworks in the same project:
+
+```js eslint.config.js
+import { zayne } from "@zayne-labs/eslint-config";
+
+export default zayne({
+  astro: true,
+  react: true,
+  vue: true,
+  svelte: true,
+});
+```
+
+## Solid
+
+Solid.js support includes reactive patterns and JSX linting.
+
+<Steps>
+  <Step title="Enable Solid support">
+    ```js eslint.config.js
+    import { zayne } from "@zayne-labs/eslint-config";
+
+    export default zayne({
+      solid: true,
+    });
+    ```
+  </Step>
+
+  <Step title="Install peer dependencies">
+    ```bash
+    pnpm i -D eslint-plugin-solid
+    ```
+  </Step>
+</Steps>
+
+## Additional Integrations
+
+### TailwindCSS
+
+Uses the enhanced `eslint-plugin-better-tailwindcss` for improved class sorting:
+
+<Steps>
+  <Step title="Enable Tailwind support">
+    ```js eslint.config.js
+    import { zayne } from "@zayne-labs/eslint-config";
+
+    export default zayne({
+      tailwindcssBetter: true,
+    });
+    ```
+  </Step>
+
+  <Step title="Install peer dependencies">
+    ```bash
+    pnpm i -D eslint-plugin-better-tailwindcss
+    ```
+  </Step>
+</Steps>
+
+### TanStack Query & Router
+
+Support for TanStack Query and Router best practices:
+
+<Steps>
+  <Step title="Enable TanStack support">
+    ```js eslint.config.js
+    import { zayne } from "@zayne-labs/eslint-config";
+
+    export default zayne({
+      tanstack: {
+        query: true,
+        router: true,
+      },
+    });
+    ```
+  </Step>
+
+  <Step title="Install peer dependencies">
+    ```bash
+    pnpm i -D @tanstack/eslint-plugin-query @tanstack/eslint-plugin-router
+    ```
+  </Step>
+</Steps>
+
+### PNPM Catalogs
+
+Lint PNPM catalog protocol usage:
+
+<Steps>
+  <Step title="Enable PNPM support">
+    ```js eslint.config.js
+    import { zayne } from "@zayne-labs/eslint-config";
+
+    export default zayne({
+      pnpm: true,
+    });
+    ```
+  </Step>
+
+  <Step title="Install peer dependencies">
+    ```bash
+    pnpm i -D eslint-plugin-pnpm
+    ```
+  </Step>
+</Steps>
+
+### Dependency Management
+
+Enforce dependency rules with `eslint-plugin-depend`:
+
+<Steps>
+  <Step title="Enable dependency rules">
+    ```js eslint.config.js
+    import { zayne } from "@zayne-labs/eslint-config";
+
+    export default zayne({
+      depend: true,
+    });
+    ```
+  </Step>
+
+  <Step title="Install peer dependencies">
+    ```bash
+    pnpm i -D eslint-plugin-depend
+    ```
+  </Step>
+</Steps>
+
+## Multi-Framework Projects
+
+You can enable multiple frameworks in the same project:
+
+```js eslint.config.js
+import { zayne } from "@zayne-labs/eslint-config";
+
+export default zayne({
+  // Enable multiple frameworks
+  react: true,
+  vue: true,
+  astro: true,
+  
+  // Enable integrations
+  tailwindcssBetter: true,
+  tanstack: {
+    query: true,
+  },
+});
+```
+
+## Example Configurations
+
+<AccordionGroup>
+  <Accordion title="Next.js with Tailwind">
+    ```js eslint.config.js
+    import { zayne } from "@zayne-labs/eslint-config";
+
+    export default zayne({
+      react: true,
+      typescript: true,
+      tailwindcssBetter: true,
+    });
+    ```
+  </Accordion>
+
+  <Accordion title="SvelteKit with TanStack Query">
+    ```js eslint.config.js
+    import { zayne } from "@zayne-labs/eslint-config";
+
+    export default zayne({
+      svelte: true,
+      typescript: true,
+      tanstack: {
+        query: true,
+      },
+    });
+    ```
+  </Accordion>
+
+  <Accordion title="Astro Multi-Framework">
+    ```js eslint.config.js
+    import { zayne } from "@zayne-labs/eslint-config";
+
+    export default zayne({
+      astro: true,
+      react: true,
+      vue: true,
+      svelte: true,
+      tailwindcssBetter: true,
+    });
+    ```
+  </Accordion>
+
+  <Accordion title="React Native (Expo)">
+    ```js eslint.config.js
+    import { zayne } from "@zayne-labs/eslint-config";
+
+    export default zayne({
+      expo: true,
+      typescript: true,
+      tanstack: {
+        query: true,
+      },
+    });
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Framework not detected">
+    If auto-detection fails, explicitly enable the framework:
+
+    ```js
+    export default zayne({
+      react: true, // Force enable
+    });
+    ```
+  </Accordion>
+
+  <Accordion title="Missing peer dependencies">
+    ESLint will prompt you to install missing peer dependencies. Follow the installation instructions provided in the terminal.
+
+    For manual installation, refer to the framework-specific sections above.
+  </Accordion>
+
+  <Accordion title="Conflicting rules between frameworks">
+    Use file-specific overrides to resolve conflicts:
+
+    ```js
+    export default zayne(
+      {
+        react: true,
+        vue: true,
+      },
+      {
+        files: ["**/*.jsx", "**/*.tsx"],
+        rules: {
+          // React-specific overrides
+        },
+      },
+      {
+        files: ["**/*.vue"],
+        rules: {
+          // Vue-specific overrides
+        },
+      }
+    );
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Customization" icon="sliders" href="/guides/eslint-customization">
+    Learn how to customize rules and override defaults
+  </Card>
+  <Card title="API Reference" icon="book" href="/api/eslint/factory">
+    View complete API documentation
+  </Card>
+</CardGroup>

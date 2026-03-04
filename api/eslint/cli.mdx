@@ -1,0 +1,327 @@
+---
+title: CLI
+description: Command-line interface for initializing and migrating ESLint configuration
+---
+
+## Overview
+
+The `@zayne-labs/eslint-config` package includes a CLI tool for easy setup and migration of ESLint configurations. The CLI automates the process of updating your project files, installing dependencies, and configuring VS Code settings.
+
+## Installation
+
+Run the CLI without installation using your package manager:
+
+<CodeGroup>
+```bash npm
+npx @zayne-labs/eslint-config
+```
+
+```bash pnpm
+pnpm dlx @zayne-labs/eslint-config
+```
+
+```bash yarn
+yarn dlx @zayne-labs/eslint-config
+```
+
+```bash bun
+bunx @zayne-labs/eslint-config
+```
+</CodeGroup>
+
+## Commands
+
+### Default Command
+
+Runs the initialization or migration wizard.
+
+```bash
+npx @zayne-labs/eslint-config [options]
+```
+
+<ParamField path="--yes" type="boolean" default="false">
+  Skip prompts and use default values. Useful for CI/CD or automated setups.
+
+  **Alias:** `-y`
+
+  ```bash
+  npx @zayne-labs/eslint-config --yes
+  ```
+</ParamField>
+
+<ParamField path="--template" type="string[]">
+  Specify framework templates for optimal customization. Multiple frameworks can be specified.
+
+  **Alias:** `-t`
+
+  **Available templates:**
+  - `vue`
+  - `react`
+  - `svelte`
+  - `astro`
+  - `solid`
+
+  ```bash
+  npx @zayne-labs/eslint-config --template react
+  npx @zayne-labs/eslint-config -t react -t typescript
+  ```
+</ParamField>
+
+<ParamField path="--extra" type="string[]">
+  Specify extra utility integrations.
+
+  **Alias:** `-e`
+
+  **Available extras:**
+  - `tailwindcss` - TailwindCSS linting support
+
+  ```bash
+  npx @zayne-labs/eslint-config --extra tailwindcss
+  npx @zayne-labs/eslint-config -e tailwindcss
+  ```
+</ParamField>
+
+### Help
+
+Display help information.
+
+```bash
+npx @zayne-labs/eslint-config --help
+```
+
+### Version
+
+Display the installed version.
+
+```bash
+npx @zayne-labs/eslint-config --version
+```
+
+## Interactive Prompts
+
+When running without the `--yes` flag, the CLI will guide you through an interactive setup:
+
+### 1. Uncommitted Changes Check
+
+The CLI checks for uncommitted changes in your Git repository. If found, you'll be prompted to confirm before proceeding.
+
+```
+There are uncommitted changes in the current repository, are you sure to continue?
+```
+
+<Note>
+It's recommended to commit your changes before running the migration to make it easier to review the changes made by the CLI.
+</Note>
+
+### 2. Framework Selection
+
+Select the frameworks used in your project:
+
+```
+Select a framework:
+❯ ◯ React
+  ◯ Vue
+  ◯ Svelte
+  ◯ Astro
+  ◯ Solid
+```
+
+Use arrow keys to navigate and space to select. Press Enter to continue.
+
+### 3. Extra Utilities
+
+Select additional utilities to integrate:
+
+```
+Select an extra util:
+❯ ◯ TailwindCSS
+```
+
+### 4. VS Code Settings
+
+Choose whether to update `.vscode/settings.json` for a better development experience:
+
+```
+Update .vscode/settings.json for better VS Code experience?
+```
+
+Selecting "Yes" will configure:
+- ESLint auto-fix on save
+- Disable conflicting formatters
+- Enable ESLint for supported file types
+
+## What the CLI Does
+
+The CLI performs three main stages:
+
+### Stage 1: Update package.json
+
+- Adds `@zayne-labs/eslint-config` to dependencies
+- Adds required ESLint plugins based on your selections
+- Adds `eslint` and `typescript` if not present
+- Removes legacy ESLint config fields (`eslintConfig`)
+- Adds lint script if not present: `"lint": "eslint ."`
+
+### Stage 2: Update ESLint Files
+
+- Creates `eslint.config.js` with your selected configuration
+- Removes old ESLint config files (`.eslintrc.*`, `.eslintignore`)
+- Generates TypeScript-aware configuration if TypeScript is detected
+
+**Example generated config:**
+
+```javascript title="eslint.config.js"
+import { zayne } from "@zayne-labs/eslint-config";
+
+export default zayne({
+  react: true,
+  typescript: true,
+  tailwindcssBetter: true,
+});
+```
+
+### Stage 3: Update VS Code Settings
+
+If enabled, updates or creates `.vscode/settings.json` with:
+
+```json
+{
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact",
+    "vue",
+    "html",
+    "markdown",
+    "json",
+    "jsonc",
+    "yaml"
+  ]
+}
+```
+
+## Examples
+
+### Interactive Setup
+
+Run without options for full interactive experience:
+
+```bash
+npx @zayne-labs/eslint-config
+```
+
+### React Project with TypeScript
+
+```bash
+npx @zayne-labs/eslint-config -t react -e tailwindcss
+```
+
+### Vue Project (Skip Prompts)
+
+```bash
+npx @zayne-labs/eslint-config -y -t vue
+```
+
+### Multi-Framework Project
+
+```bash
+npx @zayne-labs/eslint-config -t react -t solid
+```
+
+### CI/CD Setup
+
+For automated setups in CI/CD pipelines:
+
+```bash
+SKIP_PROMPT=true npx @zayne-labs/eslint-config -y
+```
+
+## Post-Installation
+
+After running the CLI:
+
+1. **Install dependencies:**
+   ```bash
+   pnpm install
+   ```
+
+2. **Run ESLint fix:**
+   ```bash
+   pnpm run lint
+   # or
+   eslint --fix .
+   ```
+
+3. **Review changes:**
+   - Check the generated `eslint.config.js`
+   - Review updates to `package.json`
+   - Verify `.vscode/settings.json` if updated
+
+4. **Customize configuration:**
+   - Edit `eslint.config.js` to add project-specific rules
+   - Add custom ignore patterns
+   - Configure framework-specific options
+
+## Troubleshooting
+
+### "eslint.config.js already exists"
+
+The CLI will not overwrite an existing `eslint.config.js`. Either:
+- Rename or remove the existing file
+- Manually migrate using the [customization guide](/guides/eslint-customization)
+
+### Missing Dependencies
+
+If you see errors about missing plugins after setup:
+
+```bash
+pnpm install
+```
+
+Ensure all peer dependencies are installed.
+
+### Type Errors in Config
+
+If using TypeScript and seeing type errors in `eslint.config.js`:
+
+1. Rename to `eslint.config.mjs` for native ESM
+2. Or add JSDoc types:
+   ```javascript
+   /** @type {import('@zayne-labs/eslint-config').ConfigComposer} */
+   export default zayne({ ... });
+   ```
+
+## Environment Variables
+
+<ParamField path="SKIP_PROMPT" type="boolean">
+  Set to `true` to skip all prompts (same as `--yes`).
+
+  ```bash
+  SKIP_PROMPT=true npx @zayne-labs/eslint-config
+  ```
+</ParamField>
+
+## CLI Options Type
+
+```typescript
+type CliRunOptions = {
+  /**
+   * Skip prompts and use default values
+   */
+  yes?: boolean;
+
+  /**
+   * Framework templates: vue / react / svelte / astro / solid
+   */
+  frameworks?: string[];
+
+  /**
+   * Extra utilities: tailwindcss
+   */
+  extra?: string[];
+};
+```

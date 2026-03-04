@@ -1,0 +1,376 @@
+---
+title: TypeScript Config Presets
+description: Comprehensive TypeScript configurations for various project types and environments
+---
+
+`@zayne-labs/tsconfig` provides battle-tested TypeScript configuration presets based on [Total TypeScript's TSConfig Cheat Sheet](https://www.totaltypescript.com/tsconfig-cheat-sheet), with additional refinements for modern development.
+
+## Installation
+
+```bash
+pnpm add -D @zayne-labs/tsconfig
+```
+
+## Base Configuration
+
+All presets extend the base configuration, which includes strict type-checking and modern TypeScript features.
+
+<ParamField path="@zayne-labs/tsconfig/base" type="tsconfig">
+  Core configuration with strict linting and isolated modules.
+
+  **Path:** `./src/base/tsconfig.base.json`
+
+  **Includes:**
+  ```json
+  {
+    "compilerOptions": {
+      // Module resolution
+      "esModuleInterop": true,
+      "moduleDetection": "force",
+      "isolatedModules": true,
+      "verbatimModuleSyntax": true,
+      "resolveJsonModule": true,
+      
+      // Type checking
+      "strict": true,
+      "noUncheckedIndexedAccess": true,
+      "noImplicitOverride": true,
+      "noImplicitReturns": true,
+      "noImplicitThis": true,
+      "noFallthroughCasesInSwitch": true,
+      
+      // Safety
+      "skipLibCheck": true,
+      "allowJs": false,
+      "allowUnreachableCode": false,
+      "forceConsistentCasingInFileNames": true,
+      
+      // Modern features
+      "useDefineForClassFields": true,
+      "erasableSyntaxOnly": true,
+      "allowSyntheticDefaultImports": true,
+      "noErrorTruncation": true
+    }
+  }
+  ```
+
+  **Usage:**
+  ```json
+  {
+    "extends": "@zayne-labs/tsconfig/base"
+  }
+  ```
+</ParamField>
+
+## Choosing the Right Preset
+
+Decide based on two key questions:
+
+1. **Are you using `tsc` to transpile `.ts` files to `.js`?**
+   - **Yes** → Use `tsc/*` presets
+   - **No** (using bundler like Vite, Webpack) → Use `bundler/*` presets
+
+2. **Does your code run in the DOM?**
+   - **Yes** (browser apps) → Use `*/dom/*` presets
+   - **No** (Node.js, CLIs) → Use `*/no-dom/*` presets
+
+## TSC Presets
+
+For projects using TypeScript's `tsc` compiler directly.
+
+### DOM Environments
+
+<ParamField path="@zayne-labs/tsconfig/tsc/dom/app" type="tsconfig">
+  For applications running in the browser, transpiled with `tsc`.
+
+  **Path:** `./src/tsc/dom/tsconfig.app.json`
+
+  **Configuration:**
+  ```json
+  {
+    "compilerOptions": {
+      "module": "NodeNext",
+      "target": "ES2022",
+      "lib": ["ES2022", "DOM", "DOM.Iterable"],
+      "sourceMap": true,
+      "outDir": "dist"
+    }
+  }
+  ```
+
+  **Usage:**
+  ```json
+  {
+    "extends": "@zayne-labs/tsconfig/tsc/dom/app"
+  }
+  ```
+</ParamField>
+
+<ParamField path="@zayne-labs/tsconfig/tsc/dom/library" type="tsconfig">
+  For libraries running in the browser, with declaration files.
+
+  **Path:** `./src/tsc/dom/tsconfig.library.json`
+
+  **Configuration:**
+  ```json
+  {
+    "compilerOptions": {
+      "module": "NodeNext",
+      "target": "ES2022",
+      "lib": ["ES2022", "DOM", "DOM.Iterable"],
+      "sourceMap": true,
+      "outDir": "dist",
+      "declaration": true
+    }
+  }
+  ```
+
+  **Usage:**
+  ```json
+  {
+    "extends": "@zayne-labs/tsconfig/tsc/dom/library"
+  }
+  ```
+</ParamField>
+
+<ParamField path="@zayne-labs/tsconfig/tsc/dom/library-monorepo" type="tsconfig">
+  For libraries in monorepos with TypeScript project references.
+
+  **Path:** `./src/tsc/dom/tsconfig.library-monorepo.json`
+
+  **Configuration:**
+  ```json
+  {
+    "compilerOptions": {
+      "module": "NodeNext",
+      "target": "ES2022",
+      "lib": ["ES2022", "DOM", "DOM.Iterable"],
+      "sourceMap": true,
+      "outDir": "dist",
+      "declaration": true,
+      "composite": true,
+      "declarationMap": true
+    }
+  }
+  ```
+
+  **Usage:**
+  ```json
+  {
+    "extends": "@zayne-labs/tsconfig/tsc/dom/library-monorepo"
+  }
+  ```
+</ParamField>
+
+### Non-DOM Environments
+
+<ParamField path="@zayne-labs/tsconfig/tsc/no-dom/app" type="tsconfig">
+  For Node.js applications or CLIs.
+
+  **Path:** `./src/tsc/no-dom/tsconfig.app.json`
+
+  **Configuration:**
+  ```json
+  {
+    "compilerOptions": {
+      "module": "NodeNext",
+      "target": "ES2022",
+      "lib": ["ES2022"],
+      "sourceMap": true,
+      "outDir": "dist"
+    }
+  }
+  ```
+
+  **Usage:**
+  ```json
+  {
+    "extends": "@zayne-labs/tsconfig/tsc/no-dom/app"
+  }
+  ```
+</ParamField>
+
+<ParamField path="@zayne-labs/tsconfig/tsc/no-dom/library" type="tsconfig">
+  For Node.js libraries with declaration files.
+
+  **Path:** `./src/tsc/no-dom/tsconfig.library.json`
+
+  **Configuration:**
+  ```json
+  {
+    "compilerOptions": {
+      "module": "NodeNext",
+      "target": "ES2022",
+      "lib": ["ES2022"],
+      "sourceMap": true,
+      "outDir": "dist",
+      "declaration": true
+    }
+  }
+  ```
+
+  **Usage:**
+  ```json
+  {
+    "extends": "@zayne-labs/tsconfig/tsc/no-dom/library"
+  }
+  ```
+</ParamField>
+
+<ParamField path="@zayne-labs/tsconfig/tsc/no-dom/library-monorepo" type="tsconfig">
+  For Node.js libraries in monorepos.
+
+  **Path:** `./src/tsc/no-dom/tsconfig.library-monorepo.json`
+
+  **Configuration:** Same as `tsc/dom/library-monorepo` but with `lib: ["ES2022"]`
+
+  **Usage:**
+  ```json
+  {
+    "extends": "@zayne-labs/tsconfig/tsc/no-dom/library-monorepo"
+  }
+  ```
+</ParamField>
+
+## Bundler Presets
+
+For projects using external bundlers (Vite, Webpack, esbuild, etc.) that handle transpilation.
+
+### DOM Environments
+
+<ParamField path="@zayne-labs/tsconfig/bundler/dom" type="tsconfig">
+  For browser apps/libraries using a bundler. Aliases: `bundler/dom/app`, `bundler/dom/library`, `bundler/dom/library-monorepo`.
+
+  **Path:** `./src/bundler/tsconfig.dom.json`
+
+  **Configuration:**
+  ```json
+  {
+    "compilerOptions": {
+      "module": "Preserve",
+      "target": "ESNext",
+      "lib": ["ESNext", "DOM", "DOM.Iterable"],
+      "noEmit": true,
+      "jsx": "preserve"
+    }
+  }
+  ```
+
+  **Usage:**
+  ```json
+  {
+    "extends": "@zayne-labs/tsconfig/bundler/dom"
+  }
+  ```
+
+  <Note>
+    All `bundler/dom/*` paths point to the same config since bundlers handle both apps and libraries identically.
+  </Note>
+</ParamField>
+
+<ParamField path="@zayne-labs/tsconfig/bundler/next" type="tsconfig">
+  Specialized preset for Next.js applications.
+
+  **Path:** `./src/bundler/tsconfig.next.json`
+
+  **Configuration:**
+  ```json
+  {
+    "compilerOptions": {
+      "module": "Preserve",
+      "target": "ESNext",
+      "lib": ["ESNext", "DOM", "DOM.Iterable"],
+      "noEmit": true,
+      "jsx": "preserve",
+      "plugins": [{ "name": "next" }],
+      "incremental": true
+    }
+  }
+  ```
+
+  **Usage:**
+  ```json
+  {
+    "extends": "@zayne-labs/tsconfig/bundler/next",
+    "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+    "exclude": ["node_modules"]
+  }
+  ```
+</ParamField>
+
+### Non-DOM Environments
+
+<ParamField path="@zayne-labs/tsconfig/bundler/no-dom" type="tsconfig">
+  For Node.js apps/libraries using a bundler. Aliases: `bundler/no-dom/app`, `bundler/no-dom/library`, `bundler/no-dom/library-monorepo`.
+
+  **Path:** `./src/bundler/tsconfig.no-dom.json`
+
+  **Configuration:**
+  ```json
+  {
+    "compilerOptions": {
+      "module": "Preserve",
+      "target": "ESNext",
+      "lib": ["ESNext"],
+      "noEmit": true,
+      "jsx": "preserve"
+    }
+  }
+  ```
+
+  **Usage:**
+  ```json
+  {
+    "extends": "@zayne-labs/tsconfig/bundler/no-dom"
+  }
+  ```
+</ParamField>
+
+## Quick Reference
+
+| Use Case | Environment | Preset |
+|----------|-------------|--------|
+| React app with Vite | Browser + Bundler | `bundler/dom` |
+| Next.js app | Browser + Bundler | `bundler/next` |
+| Node.js CLI | Node + Bundler | `bundler/no-dom` |
+| React library (tsc) | Browser + tsc | `tsc/dom/library` |
+| Monorepo package | Browser + tsc | `tsc/dom/library-monorepo` |
+| Express API | Node + tsc | `tsc/no-dom/app` |
+
+## Extending Presets
+
+All presets can be extended with project-specific options:
+
+```json
+{
+  "extends": "@zayne-labs/tsconfig/bundler/dom",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
+}
+```
+
+## Key Differences
+
+### TSC vs Bundler
+
+- **TSC presets**: Use `module: "NodeNext"` and `target: "ES2022"` for direct compilation
+- **Bundler presets**: Use `module: "Preserve"` and `target: "ESNext"`, letting the bundler handle transpilation
+
+### App vs Library
+
+- **App presets**: No declaration files needed
+- **Library presets**: Include `declaration: true` for distributing types
+
+### Library vs Library-Monorepo
+
+- **Library-Monorepo**: Adds `composite: true` and `declarationMap: true` for TypeScript project references
+
+<Info>
+  These presets prioritize type safety with strict checking and modern TypeScript features. Adjust individual compiler options as needed for your project.
+</Info>

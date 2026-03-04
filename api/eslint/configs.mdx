@@ -1,0 +1,720 @@
+---
+title: Config Exports
+description: Individual config functions exported from @zayne-labs/eslint-config
+---
+
+The `@zayne-labs/eslint-config` package exports individual config functions that can be used directly if you prefer more granular control over your ESLint configuration.
+
+## Core Configs
+
+### javascript()
+
+Core JavaScript ESLint configuration with recommended rules.
+
+```typescript
+import { javascript } from "@zayne-labs/eslint-config";
+
+export default [
+  ...await javascript({
+    overrides: {
+      "no-console": "warn",
+    },
+  }),
+];
+```
+
+<ParamField path="options" type="object">
+  <Expandable title="Properties">
+    <ParamField path="overrides" type="Record<string, RuleEntry>">
+      Override specific JavaScript rule configurations.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+**Key Features:**
+- ECMAScript latest with module support
+- Browser and Node.js globals
+- Strict error detection rules
+- Enforces modern JavaScript patterns
+- Complexity limits (max depth: 2, complexity: 50)
+
+**Notable Rules:**
+- `no-console`: Error (allows warn, error, info, trace)
+- `prefer-const`: Error with destructuring support
+- `no-var`: Error
+- `eqeqeq`: Error (always, except for null)
+- `curly`: Error (multi-line)
+
+---
+
+### typescript()
+
+TypeScript ESLint configuration with optional type-aware rules.
+
+```typescript
+import { typescript } from "@zayne-labs/eslint-config";
+
+export default [
+  ...await typescript({
+    tsconfigPath: "./tsconfig.json",
+    isTypeAware: true,
+    stylistic: true,
+  }),
+];
+```
+
+<ParamField path="options" type="object">
+  <Expandable title="Properties">
+    <ParamField path="tsconfigPath" type="true | string | string[] | null" default="true">
+      Path to tsconfig.json for type-aware rules. Set to `true` for auto-discovery.
+    </ParamField>
+
+    <ParamField path="isTypeAware" type="boolean" default="false">
+      Enable type-aware rules. Automatically `true` if `tsconfigPath` is provided.
+    </ParamField>
+
+    <ParamField path="files" type="string[]" default="['**/*.ts', '**/*.tsx', ...componentExts]">
+      Glob patterns for TypeScript files.
+    </ParamField>
+
+    <ParamField path="filesTypeAware" type="string[]" default="['**/*.ts', '**/*.tsx', ...componentExtsTypeAware]">
+      Glob patterns for type-aware files.
+    </ParamField>
+
+    <ParamField path="ignoresTypeAware" type="string[]" default="['**/*.md/**', '**/*.astro/*.ts']">
+      Patterns to exclude from type checking.
+    </ParamField>
+
+    <ParamField path="componentExts" type="string[]" default="[]">
+      Additional component file extensions (e.g., `['vue']`).
+    </ParamField>
+
+    <ParamField path="componentExtsTypeAware" type="string[]" default="[]">
+      Component extensions that should be type-aware.
+    </ParamField>
+
+    <ParamField path="erasableOnly" type="boolean" default="false">
+      Enable erasable syntax only rules from `eslint-plugin-erasable-syntax-only`.
+    </ParamField>
+
+    <ParamField path="stylistic" type="boolean" default="true">
+      Enable TypeScript stylistic rules.
+    </ParamField>
+
+    <ParamField path="allowDefaultProject" type="string[]" default="undefined">
+      Default projects to allow in the parser project service (max 8).
+    </ParamField>
+
+    <ParamField path="parserOptions" type="ParserOptions">
+      Additional TypeScript parser options.
+    </ParamField>
+
+    <ParamField path="overrides" type="Record<string, RuleEntry>">
+      Override specific TypeScript rule configurations.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+**Key Features:**
+- Strict or strict-type-checked presets
+- Type-aware rules when tsconfig provided
+- Stylistic TypeScript rules
+- Component extension support
+
+**Notable Rules:**
+- `ts-eslint/consistent-type-definitions`: Type aliases preferred
+- `ts-eslint/array-type`: Array-simple style
+- `ts-eslint/no-unused-vars`: Warning with underscore prefix support
+- `ts-eslint/prefer-nullish-coalescing`: Error (ignores conditional tests)
+- `ts-eslint/no-import-type-side-effects`: Error
+
+---
+
+### jsx()
+
+JSX-specific linting rules with optional accessibility support.
+
+```typescript
+import { jsx } from "@zayne-labs/eslint-config";
+
+export default [
+  ...await jsx({
+    a11y: true,
+  }),
+];
+```
+
+<ParamField path="options" type="object">
+  <Expandable title="Properties">
+    <ParamField path="a11y" type="boolean | object" default="false">
+      Enable JSX accessibility rules. Requires `eslint-plugin-jsx-a11y`.
+
+      When passing an object:
+      - `overrides`: Override specific a11y rule configurations
+    </ParamField>
+
+    <ParamField path="overrides" type="Record<string, RuleEntry>">
+      Override specific JSX rule configurations.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+---
+
+### ignores()
+
+Configure global ignore patterns.
+
+```typescript
+import { ignores } from "@zayne-labs/eslint-config";
+
+export default [
+  ...ignores(["dist", "build", ".cache"]),
+];
+```
+
+<ParamField path="patterns" type="string[] | ((originals: string[]) => string[])">
+  Ignore patterns to add, or a function to transform the default patterns.
+</ParamField>
+
+---
+
+### gitIgnores()
+
+Automatically use .gitignore patterns for ESLint.
+
+```typescript
+import { gitIgnores } from "@zayne-labs/eslint-config";
+
+export default [
+  ...await gitIgnores(),
+];
+```
+
+<ParamField path="options" type="FlatGitignoreOptions">
+  Options from [eslint-config-flat-gitignore](https://github.com/antfu/eslint-config-flat-gitignore).
+</ParamField>
+
+---
+
+## Framework Configs
+
+### react()
+
+Comprehensive React linting with hooks, compiler, and refresh support.
+
+```typescript
+import { react } from "@zayne-labs/eslint-config";
+
+export default [
+  ...await react({
+    typescript: true,
+    compiler: true,
+    refresh: true,
+    nextjs: true,
+  }),
+];
+```
+
+<ParamField path="options" type="object">
+  <Expandable title="Properties">
+    <ParamField path="react" type="boolean | object" default="true">
+      Enable default React rules from `@eslint-react/eslint-plugin`.
+
+      When passing an object:
+      - `overrides`: Override specific React rule configurations
+    </ParamField>
+
+    <ParamField path="compiler" type="boolean | object" default="true">
+      Enable React compiler rules for optimization.
+
+      When passing an object:
+      - `overrides`: Override specific compiler rule configurations
+    </ParamField>
+
+    <ParamField path="refresh" type="boolean | object" default="true">
+      Enable react-refresh/HMR rules.
+
+      When passing an object:
+      - `overrides`: Override specific refresh rule configurations
+    </ParamField>
+
+    <ParamField path="youMightNotNeedAnEffect" type="boolean | object" default="true">
+      Enable rules to avoid unnecessary useEffect usage.
+
+      When passing an object:
+      - `overrides`: Override specific rule configurations
+    </ParamField>
+
+    <ParamField path="nextjs" type="boolean | object" default="auto-detect">
+      Enable Next.js specific rules. Auto-detects if Next.js is installed.
+
+      When passing an object:
+      - `overrides`: Override specific Next.js rule configurations
+    </ParamField>
+
+    <ParamField path="typescript" type="boolean" default="true">
+      Enable TypeScript support for React files.
+    </ParamField>
+
+    <ParamField path="files" type="string[]" default="['src/**/*']">
+      Glob patterns for React files.
+    </ParamField>
+
+    <ParamField path="filesTypeAware" type="string[]" default="['**/*.ts', '**/*.tsx']">
+      Patterns for type-aware React files.
+    </ParamField>
+
+    <ParamField path="ignoresTypeAware" type="string[]" default="['**/*.md/**', '**/*.astro/*.ts']">
+      Patterns to exclude from type checking.
+    </ParamField>
+
+    <ParamField path="overrides" type="Record<string, RuleEntry>">
+      Override specific React rule configurations.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+**Required Plugins:**
+- `@eslint-react/eslint-plugin`
+- `eslint-plugin-react-hooks`
+- `eslint-plugin-react-refresh`
+- `eslint-plugin-react-you-might-not-need-an-effect`
+- `@next/eslint-plugin-next` (if Next.js is used)
+
+---
+
+### vue()
+
+Vue 2/3 linting with SFC block support.
+
+```typescript
+import { vue } from "@zayne-labs/eslint-config";
+
+export default [
+  ...await vue({
+    vueVersion: 3,
+    typescript: true,
+    stylistic: true,
+  }),
+];
+```
+
+<ParamField path="options" type="object">
+  <Expandable title="Properties">
+    <ParamField path="vueVersion" type="2 | 3" default="3">
+      Vue version to apply appropriate rule sets.
+    </ParamField>
+
+    <ParamField path="sfcBlocks" type="boolean | VueBlocksOptions" default="true">
+      Enable linting for Vue SFC blocks using `eslint-processor-vue-blocks`.
+    </ParamField>
+
+    <ParamField path="typescript" type="boolean" default="false">
+      Enable TypeScript support for Vue files.
+    </ParamField>
+
+    <ParamField path="stylistic" type="boolean" default="false">
+      Enable Vue stylistic rules.
+    </ParamField>
+
+    <ParamField path="overrides" type="Record<string, RuleEntry>">
+      Override specific Vue rule configurations.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+---
+
+### solid()
+
+SolidJS linting support.
+
+```typescript
+import { solid } from "@zayne-labs/eslint-config";
+
+export default [
+  ...await solid({
+    typescript: true,
+  }),
+];
+```
+
+<ParamField path="options" type="object">
+  <Expandable title="Properties">
+    <ParamField path="typescript" type="boolean" default="false">
+      Enable TypeScript support for Solid files.
+    </ParamField>
+
+    <ParamField path="files" type="string[]">
+      Glob patterns for Solid files.
+    </ParamField>
+
+    <ParamField path="overrides" type="Record<string, RuleEntry>">
+      Override specific Solid rule configurations.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+---
+
+### astro()
+
+Astro framework linting.
+
+```typescript
+import { astro } from "@zayne-labs/eslint-config";
+
+export default [
+  ...await astro({
+    typescript: true,
+  }),
+];
+```
+
+<ParamField path="options" type="object">
+  <Expandable title="Properties">
+    <ParamField path="typescript" type="boolean" default="false">
+      Enable TypeScript support for Astro files.
+    </ParamField>
+
+    <ParamField path="files" type="string[]">
+      Glob patterns for Astro files.
+    </ParamField>
+
+    <ParamField path="overrides" type="Record<string, RuleEntry>">
+      Override specific Astro rule configurations.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+---
+
+## Style & Formatting
+
+### stylistic()
+
+Stylistic formatting rules via @stylistic/eslint-plugin.
+
+```typescript
+import { stylistic } from "@zayne-labs/eslint-config";
+
+export default [
+  ...await stylistic({
+    indent: 2,
+    quotes: "single",
+    jsx: true,
+  }),
+];
+```
+
+<ParamField path="options" type="object">
+  <Expandable title="Properties">
+    <ParamField path="indent" type="number" default="2">
+      Number of spaces for indentation.
+    </ParamField>
+
+    <ParamField path="quotes" type="'single' | 'double' | 'backtick'" default="'single'">
+      Quote style preference.
+    </ParamField>
+
+    <ParamField path="jsx" type="boolean" default="false">
+      Enable JSX-specific stylistic rules.
+    </ParamField>
+
+    <ParamField path="overrides" type="Record<string, RuleEntry>">
+      Override specific stylistic rule configurations.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+---
+
+### perfectionist()
+
+Sorting and ordering rules via eslint-plugin-perfectionist.
+
+```typescript
+import { perfectionist } from "@zayne-labs/eslint-config";
+
+export default [
+  ...await perfectionist({
+    overrides: {
+      "perfectionist/sort-imports": "error",
+    },
+  }),
+];
+```
+
+<ParamField path="options" type="object">
+  <Expandable title="Properties">
+    <ParamField path="overrides" type="Record<string, RuleEntry>">
+      Override specific perfectionist rule configurations.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+---
+
+## File Format Support
+
+### jsonc()
+
+JSON/JSONC linting support.
+
+```typescript
+import { jsonc } from "@zayne-labs/eslint-config";
+
+export default [
+  ...await jsonc(),
+];
+```
+
+### sortPackageJson()
+
+Automatically sort package.json files.
+
+```typescript
+import { sortPackageJson } from "@zayne-labs/eslint-config";
+
+export default [
+  ...sortPackageJson(),
+];
+```
+
+### sortTsconfig()
+
+Automatically sort tsconfig.json files.
+
+```typescript
+import { sortTsconfig } from "@zayne-labs/eslint-config";
+
+export default [
+  ...sortTsconfig(),
+];
+```
+
+### yaml()
+
+YAML linting support.
+
+```typescript
+import { yaml } from "@zayne-labs/eslint-config";
+
+export default [
+  ...await yaml({ stylistic: true }),
+];
+```
+
+### toml()
+
+TOML linting support.
+
+```typescript
+import { toml } from "@zayne-labs/eslint-config";
+
+export default [
+  ...await toml({ stylistic: true }),
+];
+```
+
+### markdown()
+
+Markdown code block linting.
+
+```typescript
+import { markdown } from "@zayne-labs/eslint-config";
+
+export default [
+  ...await markdown({ componentExts: ["vue"] }),
+];
+```
+
+---
+
+## Code Quality
+
+### imports()
+
+Import/export linting rules.
+
+```typescript
+import { imports } from "@zayne-labs/eslint-config";
+
+export default [
+  ...await imports({
+    typescript: true,
+    stylistic: true,
+  }),
+];
+```
+
+### node()
+
+Node.js specific rules with optional security.
+
+```typescript
+import { node } from "@zayne-labs/eslint-config";
+
+export default [
+  ...await node({
+    type: "app",
+    security: true,
+  }),
+];
+```
+
+### unicorn()
+
+eslint-plugin-unicorn rules for code quality.
+
+```typescript
+import { unicorn } from "@zayne-labs/eslint-config";
+
+export default [
+  ...await unicorn({ type: "lib" }),
+];
+```
+
+### jsdoc()
+
+JSDoc linting and validation.
+
+```typescript
+import { jsdoc } from "@zayne-labs/eslint-config";
+
+export default [
+  ...await jsdoc({ stylistic: true }),
+];
+```
+
+### comments()
+
+ESLint comment directive validation.
+
+```typescript
+import { comments } from "@zayne-labs/eslint-config";
+
+export default [
+  ...await comments({ type: "app" }),
+];
+```
+
+---
+
+## Utility Configs
+
+### pnpm()
+
+pnpm workspace and catalogs support.
+
+```typescript
+import { pnpm } from "@zayne-labs/eslint-config";
+
+export default [
+  ...await pnpm({
+    catalogs: true,
+    sort: true,
+  }),
+];
+```
+
+### expo()
+
+Expo-specific rules.
+
+```typescript
+import { expo } from "@zayne-labs/eslint-config";
+
+export default [
+  ...await expo(),
+];
+```
+
+### tanstack()
+
+TanStack Query and Router linting.
+
+```typescript
+import { tanstack } from "@zayne-labs/eslint-config";
+
+export default [
+  ...await tanstack({
+    query: true,
+    router: true,
+  }),
+];
+```
+
+### tailwindcssBetter()
+
+Tailwind CSS class name linting.
+
+```typescript
+import { tailwindcssBetter } from "@zayne-labs/eslint-config";
+
+export default [
+  ...await tailwindcssBetter({
+    settings: {
+      callees: ["cn", "clsx"],
+    },
+  }),
+];
+```
+
+### depend()
+
+Dependency management rules.
+
+```typescript
+import { depend } from "@zayne-labs/eslint-config";
+
+export default [
+  ...await depend(),
+];
+```
+
+---
+
+## Usage Example
+
+Combine individual configs for full control:
+
+```javascript title="eslint.config.js"
+import {
+  javascript,
+  typescript,
+  react,
+  stylistic,
+  imports,
+  jsonc,
+} from "@zayne-labs/eslint-config";
+
+export default [
+  ...await javascript(),
+  ...await typescript({
+    tsconfigPath: "./tsconfig.json",
+    isTypeAware: true,
+  }),
+  ...await react({
+    nextjs: true,
+    compiler: true,
+  }),
+  ...await stylistic({
+    indent: 2,
+    quotes: "single",
+    jsx: true,
+  }),
+  ...await imports({
+    typescript: true,
+    stylistic: true,
+  }),
+  ...await jsonc(),
+  {
+    files: ["**/*.tsx"],
+    rules: {
+      "react-x/no-clone-element": "error",
+    },
+  },
+];
+```

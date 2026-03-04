@@ -1,0 +1,146 @@
+---
+title: zayne()
+description: Factory function for creating customized Prettier configurations
+---
+
+The `zayne()` factory function creates a modular Prettier configuration by combining base settings, import sorting, Tailwind CSS support, and Astro formatting.
+
+## Function Signature
+
+```typescript
+const zayne: (
+  options?: OptionsPrettierConfig,
+  ...extraConfigs: ResolvedPrettierConfig[]
+) => Promise<ResolvedPrettierConfig>
+```
+
+## Parameters
+
+<ParamField path="options" type="OptionsPrettierConfig" default="{}">
+  Configuration object to enable and customize different features.
+
+  <Expandable title="properties">
+    <ParamField path="base" type="boolean | Config" default="true">
+      Opinionated base Prettier defaults including settings for tabs, print width, quotes, and trailing commas.
+    </ParamField>
+
+    <ParamField path="sortImports" type="boolean | OptionsSortImports" default="true">
+      Enables `@ianvs/prettier-plugin-sort-imports` with distance-based sorting logic.
+      
+      When enabled, imports are organized by proximity:
+      1. User patterns (custom `importOrder`)
+      2. URLs (remote modules like `https://esm.sh/...`)
+      3. Protocols (`node:`, `bun:`, `jsr:`, `npm:`)
+      4. Third-party packages
+      5. Aliases (`@/`, `#`, `~`, `$`, `%`)
+      6. Relative/absolute paths
+      7. CSS files (always last)
+    </ParamField>
+
+    <ParamField path="tailwindcss" type="boolean | OptionsTailwindCss" default="false">
+      Enables Tailwind CSS class sorting via three merged plugins:
+      - `prettier-plugin-tailwindcss` (class sorting)
+      - `prettier-plugin-classnames` (multi-line formatting)
+      - `prettier-plugin-merge` (plugin coordination)
+      
+      Supports Tailwind v4 with `tailwindStylesheet` option.
+    </ParamField>
+
+    <ParamField path="astro" type="boolean | OptionsAstro" default="false">
+      Enables `prettier-plugin-astro` for formatting `.astro` files with proper parser support.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+<ParamField path="...extraConfigs" type="ResolvedPrettierConfig[]">
+  Additional Prettier configuration objects to merge. Array properties (like `plugins` and `overrides`) are merged intelligently without duplicates, while other values overwrite.
+</ParamField>
+
+## Returns
+
+<ResponseField name="config" type="Promise<ResolvedPrettierConfig>">
+  The combined Prettier configuration object ready to export.
+</ResponseField>
+
+## Examples
+
+### Basic Usage
+
+```typescript
+// prettier.config.js
+import { zayne } from "@zayne-labs/prettier-config";
+
+export default zayne({
+  base: true,
+  sortImports: true,
+  tailwindcss: true,
+  astro: true,
+});
+```
+
+### With Custom Options
+
+```typescript
+import { zayne } from "@zayne-labs/prettier-config";
+
+export default zayne(
+  {
+    base: true,
+    sortImports: {
+      importOrder: ["^@company/"], // Custom import group at top
+      importOrderCaseSensitive: true,
+    },
+    tailwindcss: {
+      tailwindStylesheet: "./src/styles.css",
+      customFunctions: ["cn", "clsx"],
+    },
+  },
+  // Extra config to merge
+  {
+    printWidth: 120,
+    semi: true,
+  }
+);
+```
+
+### Minimal Configuration
+
+```typescript
+import { zayne } from "@zayne-labs/prettier-config";
+
+// Uses default base + sortImports
+export default zayne();
+```
+
+### Extending with Custom Config
+
+```typescript
+import { zayne } from "@zayne-labs/prettier-config";
+
+export default zayne(
+  { tailwindcss: true },
+  {
+    useTabs: false,
+    printWidth: 100,
+    singleQuote: true,
+  }
+);
+```
+
+## Plugin Auto-Installation
+
+When you enable a feature, the factory checks if required plugins are installed. If missing, it prompts you to auto-install them when running `prettier --write .`.
+
+This keeps your `node_modules` lean by only installing plugins you actually use.
+
+## Configuration Merging
+
+The factory intelligently merges configurations:
+- **Arrays** (`plugins`, `overrides`): Deduplicated and combined
+- **Objects**: Shallow merged with later values overwriting earlier ones
+- **Primitives**: Last value wins
+
+<Note>
+  The Tailwind plugin is always applied last to avoid conflicts with other formatters.
+  See [prettier-plugin-tailwindcss compatibility](https://github.com/tailwindlabs/prettier-plugin-tailwindcss#compatibility-with-other-prettier-plugins).
+</Note>

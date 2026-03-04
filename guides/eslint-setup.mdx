@@ -1,0 +1,276 @@
+---
+title: 'ESLint Setup'
+description: 'Complete guide to setting up ESLint configuration with CLI, manual installation, and IDE integration'
+---
+
+## Overview
+
+The `@zayne-labs/eslint-config` provides an opinionated ESLint configuration with sensible defaults and zero-config setup. It works out-of-the-box with TypeScript, JSX, Vue, JSON, YAML, TOML, Markdown, and more.
+
+### Key Features
+
+- One-line setup with reasonable defaults and best practices
+- ESLint Flat config for easy composition
+- Respects `.gitignore` by default
+- Highly customizable when needed
+- Interactive CLI for easy setup
+- Requires ESLint v9.5.0+ and Node.js v20+
+
+## Installation
+
+<Tabs>
+  <Tab title="Interactive CLI (Recommended)">
+    The CLI provides the easiest way to set up your ESLint configuration:
+
+    <Steps>
+      <Step title="Run the CLI">
+        ```bash
+        pnpx @zayne-labs/eslint-config@latest
+        ```
+      </Step>
+
+      <Step title="Follow the prompts">
+        The CLI will guide you through:
+        - Framework selection (React, Vue, Svelte, Astro)
+        - Additional integrations (TailwindCSS, etc.)
+        - Automatic dependency installation
+      </Step>
+
+      <Step title="Start linting">
+        Your configuration is ready! The CLI automatically creates `eslint.config.js` and installs dependencies.
+      </Step>
+    </Steps>
+  </Tab>
+
+  <Tab title="Manual Installation">
+    <Steps>
+      <Step title="Install dependencies">
+        ```bash
+        pnpm add -D eslint @zayne-labs/eslint-config
+        ```
+      </Step>
+
+      <Step title="Create config file">
+        Create `eslint.config.js` in your project root:
+
+        ```js
+        import { zayne } from "@zayne-labs/eslint-config";
+
+        export default zayne();
+        ```
+      </Step>
+
+      <Step title="Add package scripts">
+        Add these scripts to your `package.json`:
+
+        ```json
+        {
+          "scripts": {
+            "lint:eslint": "eslint .",
+            "lint:eslint-fix": "eslint . --fix"
+          }
+        }
+        ```
+      </Step>
+    </Steps>
+  </Tab>
+</Tabs>
+
+## Legacy Config Migration
+
+<Accordion title="Combining with existing eslintrc configs">
+  If you have existing eslintrc configs, use [`@eslint/eslintrc`](https://www.npmjs.com/package/@eslint/eslintrc) to convert them:
+
+  ```js
+  import { FlatCompat } from "@eslint/eslintrc";
+  import { zayne } from "@zayne-labs/eslint-config";
+
+  const compat = new FlatCompat();
+
+  export default zayne(
+    {
+      ignores: [],
+    },
+    ...compat.config({
+      extends: [
+        "eslint:recommended",
+        // Other extends...
+      ],
+    })
+    // Other flat configs...
+  );
+  ```
+
+  <Note>
+    `.eslintignore` no longer works in flat config. Use the `ignores` option instead.
+  </Note>
+</Accordion>
+
+## IDE Configuration
+
+Configure your editor to auto-fix ESLint issues on save for the best development experience.
+
+<Tabs>
+  <Tab title="VS Code">
+    <Steps>
+      <Step title="Install the ESLint extension">
+        Install the [ESLint extension](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) from the VS Code marketplace.
+      </Step>
+
+      <Step title="Configure settings">
+        Create or update `.vscode/settings.json` in your project:
+
+        ```json
+        {
+          // Auto fix on save
+          "editor.codeActionsOnSave": {
+            "source.fixAll.eslint": "explicit",
+            "source.organizeImports": "never"
+          },
+
+          // Enable eslint for all supported languages
+          "eslint.validate": [
+            "javascript",
+            "javascriptreact",
+            "typescript",
+            "typescriptreact",
+            "vue",
+            "html",
+            "markdown",
+            "json",
+            "jsonc",
+            "yaml",
+            "toml",
+            "xml",
+            "gql",
+            "graphql",
+            "astro",
+            "svelte",
+            "css",
+            "less",
+            "scss",
+            "pcss",
+            "postcss"
+          ]
+        }
+        ```
+      </Step>
+
+      <Step title="Restart VS Code">
+        Reload your VS Code window to apply the changes.
+      </Step>
+    </Steps>
+  </Tab>
+
+  <Tab title="Neovim">
+    <Steps>
+      <Step title="Configure LSP">
+        Update your Neovim configuration to enable ESLint for all supported languages:
+
+        ```lua
+        local lspconfig = require('lspconfig')
+
+        lspconfig.eslint.setup({
+          filetypes = {
+            "javascript",
+            "javascriptreact",
+            "javascript.jsx",
+            "typescript",
+            "typescriptreact",
+            "typescript.tsx",
+            "vue",
+            "html",
+            "markdown",
+            "json",
+            "jsonc",
+            "yaml",
+            "toml",
+            "xml",
+            "gql",
+            "graphql",
+            "astro",
+            "svelte",
+            "css",
+            "less",
+            "scss",
+            "pcss",
+            "postcss"
+          },
+        })
+        ```
+      </Step>
+
+      <Step title="Enable format on save">
+        Choose one of these options:
+
+        **Option 1: Built-in EslintFixAll command**
+
+        ```lua
+        lspconfig.eslint.setup({
+          on_attach = function(client, bufnr)
+            vim.api.nvim_create_autocmd("BufWritePre", {
+              buffer = bufnr,
+              command = "EslintFixAll",
+            })
+          end,
+        })
+        ```
+
+        **Option 2: Use formatting plugins**
+
+        Use [conform.nvim](https://github.com/stevearc/conform.nvim), [none-ls](https://github.com/nvimtools/none-ls.nvim), or [nvim-lint](https://github.com/mfussenegger/nvim-lint)
+      </Step>
+    </Steps>
+  </Tab>
+</Tabs>
+
+## Running ESLint
+
+Once configured, you can run ESLint using the package scripts:
+
+<CodeGroup>
+  ```bash pnpm
+  # Check for issues
+  pnpm lint:eslint
+
+  # Fix issues automatically
+  pnpm lint:eslint-fix
+  ```
+
+  ```bash npm
+  # Check for issues
+  npm run lint:eslint
+
+  # Fix issues automatically
+  npm run lint:eslint-fix
+  ```
+
+  ```bash yarn
+  # Check for issues
+  yarn lint:eslint
+
+  # Fix issues automatically
+  yarn lint:eslint-fix
+  ```
+</CodeGroup>
+
+## Inspecting Your Configuration
+
+View your active ESLint rules and configuration using the ESLint Config Inspector:
+
+```bash
+npx @eslint/config-inspector@latest
+```
+
+This opens an interactive UI in your browser showing all enabled rules, their sources, and configurations.
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Customize Rules" icon="sliders" href="/guides/eslint-customization">
+    Learn how to customize rules and override defaults
+  </Card>
+  <Card title="Framework Setup" icon="code" href="/guides/eslint-frameworks">
+    Configure ESLint for React, Vue, Svelte, and more
+  </Card>
+</CardGroup>

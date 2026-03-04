@@ -1,0 +1,425 @@
+---
+title: Prettier Config
+description: Shared Prettier configuration with modular factory system, smart import sorting, and Tailwind CSS v4 support
+---
+
+The `@zayne-labs/prettier-config` package provides a modular Prettier configuration with automatic plugin detection, refined sorting logic, and seamless integration with modern frameworks.
+
+## Features
+
+<CardGroup cols={2}>
+  <Card title="Modular Factory" icon="cube">
+    Toggle features like Tailwind, Astro, and Import Sorting individually
+  </Card>
+  <Card title="Smart Import Sorting" icon="arrow-down-1-9">
+    Distance-based sorting from URLs to local paths
+  </Card>
+  <Card title="Tailwind v4 Ready" icon="paintbrush">
+    Support for tailwindStylesheet and advanced class sorting
+  </Card>
+  <Card title="Auto-Installation" icon="download">
+    Prompts to install missing plugins when needed
+  </Card>
+</CardGroup>
+
+## Installation
+
+```bash
+pnpm add -D @zayne-labs/prettier-config
+```
+
+## Usage
+
+The package exports a factory function `zayne` that combines configuration segments:
+
+```js title="prettier.config.js"
+import { zayne } from "@zayne-labs/prettier-config";
+
+export default zayne({
+  base: true, // Enabled by default
+  sortImports: true, // Enabled by default
+  tailwindcss: true,
+  astro: true,
+});
+```
+
+## Configuration Options
+
+### Base Options
+
+The `zayne` factory accepts an options object:
+
+<ParamField path="base" type="boolean | Config" default="true">
+  Opinionated base defaults for consistent formatting.
+</ParamField>
+
+<ParamField path="sortImports" type="boolean | OptionsSortImports" default="true">
+  Enables `@ianvs/prettier-plugin-sort-imports` with distance-based sorting.
+</ParamField>
+
+<ParamField path="tailwindcss" type="boolean | OptionsTailwindCss" default="false">
+  Enables Tailwind and ClassNames plugins for class sorting.
+</ParamField>
+
+<ParamField path="astro" type="boolean | OptionsAstro" default="false">
+  Enables `prettier-plugin-astro` for Astro component formatting.
+</ParamField>
+
+### Basic Example
+
+```js title="prettier.config.js"
+import { zayne } from "@zayne-labs/prettier-config";
+
+export default zayne({
+  base: true,
+  sortImports: true,
+  tailwindcss: false,
+  astro: false,
+});
+```
+
+## Import Sorting
+
+### Default Sorting Rules
+
+When `sortImports` is enabled (default), imports are organized by "distance" from the current file:
+
+1. **User patterns**: Custom patterns passed via `importOrder` (highest priority)
+2. **URLs**: Remote modules (e.g., `https://esm.sh/...`)
+3. **Protocols**: Built-in protocols (`node:`, `bun:`, `jsr:`, `npm:`)
+4. **Packages**: Third-party npm packages (e.g., `react`, `lodash`)
+5. **Aliases**: Local aliases (`@/`, `#`, `~`, `$`, `%`)
+6. **Paths**: Relative and absolute file paths (excluding CSS)
+7. **CSS**: Style files (lowest priority)
+
+### Example Sorted Imports
+
+```js
+// User patterns (if specified)
+import config from "./config";
+
+// URLs
+import React from "https://esm.sh/react";
+
+// Protocols
+import fs from "node:fs";
+import { serve } from "bun:serve";
+
+// Packages
+import { useState } from "react";
+import _ from "lodash";
+
+// Aliases
+import { Button } from "@/components/Button";
+import utils from "#utils";
+
+// Paths
+import { helper } from "../helpers";
+import { config } from "./local-config";
+
+// CSS (always last)
+import "./styles.css";
+```
+
+### Custom Import Order
+
+Override the default sorting with custom patterns:
+
+```js title="prettier.config.js"
+import { zayne } from "@zayne-labs/prettier-config";
+
+export default zayne({
+  sortImports: {
+    importOrder: [
+      "^react",
+      "^next",
+      "<THIRD_PARTY_MODULES>",
+      "^@/(.*)$",
+      "^[./]",
+    ],
+  },
+});
+```
+
+<Tip>
+  Use the special `<THIRD_PARTY_MODULES>` token to represent all npm packages in your custom order.
+</Tip>
+
+## Tailwind CSS Support
+
+The Tailwind integration combines three plugins for comprehensive class handling:
+
+- **`prettier-plugin-tailwindcss`**: Sorts Tailwind classes
+- **`prettier-plugin-classnames`**: Multi-line formatting & attribute support
+- **`prettier-plugin-merge`**: Ensures plugins work together
+
+### Basic Tailwind Setup
+
+```js title="prettier.config.js"
+import { zayne } from "@zayne-labs/prettier-config";
+
+export default zayne({
+  tailwindcss: true,
+});
+```
+
+### Advanced Tailwind Configuration
+
+```js title="prettier.config.js"
+import { zayne } from "@zayne-labs/prettier-config";
+
+export default zayne({
+  tailwindcss: {
+    // Additional attributes to sort classes in
+    customAttributes: ["classNames", "classes", "className"],
+    
+    // Functions to sort classes in
+    customFunctions: ["cn", "tv", "tw", "clsx"],
+    
+    // Path to Tailwind CSS entry point (for v4)
+    tailwindStylesheet: "./src/styles/tailwind.css",
+    
+    // Criterion for ending class names
+    endPosition: "absolute", // or 'relative'
+    
+    // Auto-transform non-expression classes to expression syntax
+    syntaxTransformation: true,
+  },
+});
+```
+
+### Tailwind Options
+
+<ParamField path="customAttributes" type="string[]">
+  Additional attributes to sort Tailwind classes in.
+  
+  ```js
+  customAttributes: ["classNames", "classes", "containerClass"]
+  ```
+</ParamField>
+
+<ParamField path="customFunctions" type="string[]">
+  Functions to sort Tailwind classes in.
+  
+  ```js
+  customFunctions: ["cn", "tv", "tw", "clsx", "classnames"]
+  ```
+</ParamField>
+
+<ParamField path="tailwindStylesheet" type="string">
+  Path to your CSS entry point (Tailwind v4 feature).
+  
+  ```js
+  tailwindStylesheet: "./app/globals.css"
+  ```
+</ParamField>
+
+<ParamField path="endPosition" type="'absolute' | 'relative'">
+  Criterion for ending class names on line wraps.
+</ParamField>
+
+<ParamField path="syntaxTransformation" type="boolean">
+  Auto-transform non-expression classes to expression syntax when wrapping.
+</ParamField>
+
+### Tailwind with Custom Functions
+
+```jsx
+import { cn } from "@/lib/utils";
+
+export function Button({ className, ...props }) {
+  return (
+    <button
+      className={cn(
+        "rounded-lg bg-blue-500 px-4 py-2 text-white hover:bg-blue-600",
+        className
+      )}
+      {...props}
+    />
+  );
+}
+```
+
+## Astro Support
+
+Enable Prettier formatting for Astro components:
+
+```js title="prettier.config.js"
+import { zayne } from "@zayne-labs/prettier-config";
+
+export default zayne({
+  astro: true,
+});
+```
+
+**Install peer dependencies:**
+
+```bash
+pnpm i -D prettier-plugin-astro
+```
+
+## Extending Configuration
+
+Merge additional configuration objects:
+
+```js title="prettier.config.js"
+import { zayne } from "@zayne-labs/prettier-config";
+
+export default zayne(
+  {
+    tailwindcss: true,
+    sortImports: true,
+  },
+  // Extra config objects
+  {
+    printWidth: 120,
+    semi: true,
+    singleQuote: false,
+  },
+  {
+    // Another config object
+    tabWidth: 4,
+  }
+);
+```
+
+<Note>
+  The factory intelligently merges arrays (plugins, overrides) without duplicates. Later configs override earlier ones for scalar values.
+</Note>
+
+## Plugin Auto-Installation
+
+This config uses a lazy-loading approach to avoid bloating `node_modules` with unused plugins.
+
+### How It Works
+
+1. When you enable a feature (e.g., `astro: true`), the config checks if required plugins are installed
+2. If missing, Prettier will prompt you to auto-install when running `prettier --write .`
+3. Plugins are only added as peer dependencies, not bundled
+
+### Example Prompt
+
+```bash
+prettier --write .
+```
+
+Output:
+```
+Missing plugin: prettier-plugin-astro
+Would you like to install it? (Y/n)
+```
+
+<Tip>
+  This approach keeps your `node_modules` lean and only installs what you actually use.
+</Tip>
+
+## Complete Example
+
+A real-world configuration for a Next.js project with Tailwind:
+
+```js title="prettier.config.js"
+import { zayne } from "@zayne-labs/prettier-config";
+
+export default zayne(
+  {
+    base: true,
+    sortImports: {
+      importOrder: [
+        "^react$",
+        "^next",
+        "<THIRD_PARTY_MODULES>",
+        "^@/(.*)$",
+        "^[./]",
+        ".css$",
+      ],
+    },
+    tailwindcss: {
+      customFunctions: ["cn", "clsx"],
+      tailwindStylesheet: "./app/globals.css",
+    },
+  },
+  // Additional overrides
+  {
+    printWidth: 100,
+    semi: true,
+    singleQuote: false,
+    trailingComma: "es5",
+    tabWidth: 2,
+    useTabs: false,
+  }
+);
+```
+
+```json title="package.json"
+{
+  "scripts": {
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "devDependencies": {
+    "@ianvs/prettier-plugin-sort-imports": "^4.0.0",
+    "@zayne-labs/prettier-config": "^0.11.30",
+    "prettier": "^3.0.0",
+    "prettier-plugin-classnames": "^0.9.0",
+    "prettier-plugin-merge": "^0.9.0",
+    "prettier-plugin-tailwindcss": "^0.7.0"
+  }
+}
+```
+
+## Deduplication
+
+The factory automatically deduplicates:
+
+- **Plugins array**: Removes duplicate plugin names
+- **Overrides array**: Merges overrides with the same file patterns
+- **Object values**: Later configs override earlier ones
+
+```js
+import { zayne } from "@zayne-labs/prettier-config";
+
+// This config is automatically deduplicated
+export default zayne(
+  {
+    tailwindcss: true, // Adds tailwindcss plugins
+  },
+  {
+    plugins: ["prettier-plugin-other"], // Additional plugin
+  }
+  // Result: plugins array contains unique entries only
+);
+```
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Can I disable import sorting?">
+    Yes, set `sortImports: false` in the factory options:
+    
+    ```js
+    export default zayne({
+      sortImports: false,
+    });
+    ```
+  </Accordion>
+  
+  <Accordion title="How do I use with ESLint?">
+    This config works alongside ESLint. Use [`@zayne-labs/eslint-config`](/packages/eslint-config) for linting, and this package for formatting. Prettier focuses on code style, ESLint on code quality.
+  </Accordion>
+  
+  <Accordion title="Why aren't plugins included as dependencies?">
+    Plugins are peer dependencies to keep the package lightweight. You only install what you use, and the config prompts you when needed.
+  </Accordion>
+  
+  <Accordion title="Can I use this in a monorepo?">
+    Yes! Place the config in your root and reference it from workspace packages, or create a shared config package that extends this one.
+  </Accordion>
+</AccordionGroup>
+
+## Contributing
+
+Contributions welcome! Visit the [GitHub repository](https://github.com/zayne-labs/config) to report issues or submit pull requests.
+
+## License
+
+MIT © [Zayne Labs](https://github.com/zayne-labs)

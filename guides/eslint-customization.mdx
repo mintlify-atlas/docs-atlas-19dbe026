@@ -1,0 +1,407 @@
+---
+title: 'ESLint Customization'
+description: 'Learn how to customize rules, use factory options, and compose advanced configurations'
+---
+
+## Overview
+
+While `@zayne-labs/eslint-config` works out of the box with zero configuration, it offers extensive customization options when you need them. This guide covers all the ways you can tailor the configuration to your project's needs.
+
+## Factory Options
+
+The `zayne()` factory function accepts an options object to control which features are enabled and how they behave.
+
+### Basic Configuration
+
+```js
+import { zayne } from "@zayne-labs/eslint-config";
+
+export default zayne({
+  // Project type: 'app' (default) or 'lib'
+  type: "app",
+
+  // Enable stylistic formatting rules
+  stylistic: true,
+
+  // TypeScript and React are auto-detected, but can be explicit
+  typescript: true,
+  react: true,
+});
+```
+
+### Ignore Patterns
+
+<Note>
+  `.eslintignore` is no longer supported in Flat config. Use the `ignores` option instead.
+</Note>
+
+The `ignores` option in the factory is treated as global ignores and **extends** the config's default ignores:
+
+```js
+import { zayne } from "@zayne-labs/eslint-config";
+
+export default zayne({
+  ignores: [
+    "**/fixtures",
+    "**/temp",
+    "**/generated",
+    // ...more globs
+  ],
+});
+```
+
+You can also pass a function to modify the default ignores:
+
+```js
+import { zayne } from "@zayne-labs/eslint-config";
+
+export default zayne({
+  ignores: (defaultIgnores) => [
+    ...defaultIgnores,
+    "custom-folder/**",
+  ],
+});
+```
+
+### Gitignore Integration
+
+By default, ESLint will parse your `.gitignore` file to determine what to ignore:
+
+```js
+import { zayne } from "@zayne-labs/eslint-config";
+
+export default zayne({
+  // Parse .gitignore file (enabled by default)
+  gitignore: true,
+});
+```
+
+Disable if you want to manage ignores manually:
+
+```js
+export default zayne({
+  gitignore: false,
+});
+```
+
+### Stylistic Rules
+
+Enable stylistic formatting rules for code consistency:
+
+<Tabs>
+  <Tab title="Simple Enable">
+    ```js
+    import { zayne } from "@zayne-labs/eslint-config";
+
+    export default zayne({
+      stylistic: true,
+    });
+    ```
+  </Tab>
+
+  <Tab title="Custom Options">
+    ```js
+    import { zayne } from "@zayne-labs/eslint-config";
+
+    export default zayne({
+      stylistic: {
+        jsx: true,
+        quotes: "single", // or 'double'
+        indent: 2,
+        semi: false,
+      },
+    });
+    ```
+  </Tab>
+</Tabs>
+
+### Disabling Optional Configs
+
+Disable all optional configs at once, keeping only essentials:
+
+```js
+import { zayne } from "@zayne-labs/eslint-config";
+
+export default zayne({
+  // Disable all optional configs
+  withDefaults: false,
+});
+```
+
+### Language Support
+
+Selectively enable or disable language support:
+
+```js
+import { zayne } from "@zayne-labs/eslint-config";
+
+export default zayne({
+  // Disable specific language support
+  jsonc: false,
+  yaml: false,
+  toml: false,
+  markdown: false,
+});
+```
+
+## Custom Rules
+
+Pass additional configs as extra arguments to override or extend rules:
+
+<CodeGroup>
+  ```js File-Specific Rules
+  import { zayne } from "@zayne-labs/eslint-config";
+
+  export default zayne(
+    {
+      // Factory options
+    },
+    // Additional flat configs
+    {
+      files: ["**/*.ts"],
+      rules: {
+        "@typescript-eslint/no-explicit-any": "off",
+      },
+    }
+  );
+  ```
+
+  ```js Global Rules
+  import { zayne } from "@zayne-labs/eslint-config";
+
+  export default zayne(
+    {},
+    {
+      rules: {
+        "no-console": "warn",
+        "no-debugger": "error",
+      },
+    }
+  );
+  ```
+
+  ```js Multiple Configs
+  import { zayne } from "@zayne-labs/eslint-config";
+
+  export default zayne(
+    {},
+    // TypeScript files
+    {
+      files: ["**/*.ts", "**/*.tsx"],
+      rules: {
+        "@typescript-eslint/no-explicit-any": "off",
+      },
+    },
+    // Test files
+    {
+      files: ["**/*.test.ts", "**/*.spec.ts"],
+      rules: {
+        "@typescript-eslint/no-non-null-assertion": "off",
+      },
+    },
+    // Global overrides
+    {
+      rules: {
+        "no-console": "warn",
+      },
+    }
+  );
+  ```
+</CodeGroup>
+
+## Type-Aware Rules
+
+Type-aware linting is automatically enabled when TypeScript is detected. It uses the nearest `tsconfig.json` by default.
+
+<Warning>
+  Only specify `tsconfigPath` when you need to point to a different location or use multiple tsconfigs.
+</Warning>
+
+<Tabs>
+  <Tab title="Single Custom Location">
+    ```js
+    import { zayne } from "@zayne-labs/eslint-config";
+
+    export default zayne({
+      typescript: {
+        tsconfigPath: "./config/tsconfig.json",
+      },
+    });
+    ```
+  </Tab>
+
+  <Tab title="Multiple TSConfigs">
+    ```js
+    import { zayne } from "@zayne-labs/eslint-config";
+
+    export default zayne({
+      typescript: {
+        tsconfigPath: [
+          "./tsconfig.json",
+          "./tsconfig.node.json",
+        ],
+      },
+    });
+    ```
+  </Tab>
+</Tabs>
+
+## Advanced Composition
+
+<Warning>
+  This low-level approach is for advanced use cases only. The `zayne()` factory handles option coordination automatically. Use this only if you need granular control over config composition.
+</Warning>
+
+Import and compose fine-grained configs directly:
+
+```js
+import {
+  astro,
+  comments,
+  depend,
+  ignores,
+  imports,
+  javascript,
+  jsdoc,
+  jsonc,
+  jsx,
+  markdown,
+  node,
+  perfectionist,
+  react,
+  stylistic,
+  typescript,
+  unicorn,
+  vue,
+  yaml,
+} from "@zayne-labs/eslint-config";
+import { FlatConfigComposer } from "eslint-flat-config-utils";
+
+export default new FlatConfigComposer()
+  .append(
+    ignores(),
+    javascript(),
+    typescript(),
+    jsx(),
+    comments(),
+    node(),
+    jsdoc(),
+    imports(),
+    unicorn(),
+    perfectionist(),
+    stylistic(),
+    react(),
+    vue(),
+    jsonc(),
+    yaml(),
+    markdown()
+  );
+```
+
+<Accordion title="View available config modules">
+  Available config modules:
+  - `astro` - Astro framework support
+  - `comments` - ESLint directive comments
+  - `depend` - Dependency management rules
+  - `expo` - React Native/Expo support
+  - `ignores` - Global ignore patterns
+  - `imports` - Import/export rules
+  - `javascript` - JavaScript rules
+  - `jsdoc` - JSDoc comment rules
+  - `jsonc` - JSON/JSONC support
+  - `jsx` - JSX rules
+  - `markdown` - Markdown file support
+  - `node` - Node.js rules
+  - `perfectionist` - Code organization rules
+  - `pnpm` - PNPM catalog rules
+  - `react` - React framework rules
+  - `solid` - Solid.js framework rules
+  - `sortPackageJson` - package.json sorting
+  - `sortTsconfig` - tsconfig.json sorting
+  - `stylistic` - Stylistic formatting rules
+  - `tailwindcssBetter` - Tailwind CSS rules
+  - `tanstack` - TanStack Query/Router rules
+  - `toml` - TOML file support
+  - `typescript` - TypeScript rules
+  - `unicorn` - Additional best practices
+  - `vue` - Vue framework rules
+  - `yaml` - YAML file support
+
+  See the [configs directory](https://github.com/zayne-labs/eslint-config/blob/main/src/configs) for implementation details.
+</Accordion>
+
+## Example Configurations
+
+<AccordionGroup>
+  <Accordion title="Monorepo Setup">
+    ```js
+    import { zayne } from "@zayne-labs/eslint-config";
+
+    export default zayne(
+      {
+        type: "lib",
+        typescript: {
+          tsconfigPath: [
+            "./packages/*/tsconfig.json",
+          ],
+        },
+      },
+      {
+        files: ["packages/**/*.ts"],
+        rules: {
+          "no-console": "error",
+        },
+      }
+    );
+    ```
+  </Accordion>
+
+  <Accordion title="Strict TypeScript">
+    ```js
+    import { zayne } from "@zayne-labs/eslint-config";
+
+    export default zayne(
+      {
+        typescript: true,
+      },
+      {
+        files: ["**/*.ts", "**/*.tsx"],
+        rules: {
+          "@typescript-eslint/no-explicit-any": "error",
+          "@typescript-eslint/no-non-null-assertion": "error",
+          "@typescript-eslint/strict-boolean-expressions": "error",
+        },
+      }
+    );
+    ```
+  </Accordion>
+
+  <Accordion title="Test Files Configuration">
+    ```js
+    import { zayne } from "@zayne-labs/eslint-config";
+
+    export default zayne(
+      {},
+      {
+        files: ["**/*.test.ts", "**/*.spec.ts"],
+        rules: {
+          "@typescript-eslint/no-explicit-any": "off",
+          "@typescript-eslint/no-non-null-assertion": "off",
+          "no-console": "off",
+        },
+      }
+    );
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Framework Setup" icon="code" href="/guides/eslint-frameworks">
+    Configure ESLint for React, Vue, Svelte, and more
+  </Card>
+  <Card title="API Reference" icon="book" href="/api/eslint/factory">
+    View complete API documentation
+  </Card>
+</CardGroup>

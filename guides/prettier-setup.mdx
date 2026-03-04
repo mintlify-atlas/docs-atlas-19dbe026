@@ -1,0 +1,404 @@
+---
+title: 'Prettier Setup'
+description: 'Configure Prettier with smart import sorting, Tailwind CSS support, and modular plugin system'
+---
+
+## Overview
+
+`@zayne-labs/prettier-config` provides a modular Prettier configuration with automatic plugin detection, smart import sorting, and Tailwind CSS v4 support.
+
+### Key Features
+
+- Modular factory system with toggleable features
+- Smart import sorting with distance-based logic
+- Tailwind CSS v4 ready with advanced class sorting
+- Auto-installation prompts for missing plugins
+- Deduplicated configuration merging
+
+## Installation
+
+```bash
+pnpm add -D @zayne-labs/prettier-config
+```
+
+## Basic Setup
+
+Create a `prettier.config.js` file in your project root:
+
+```js prettier.config.js
+import { zayne } from "@zayne-labs/prettier-config";
+
+export default zayne({
+  base: true, // Enabled by default
+  sortImports: true, // Enabled by default
+});
+```
+
+<Note>
+  The configuration uses a factory function that combines different config segments based on your needs.
+</Note>
+
+## Configuration Options
+
+The `zayne` factory accepts an options object with the following properties:
+
+<ResponseField name="base" type="boolean | Config" default={true}>
+  Opinionated base defaults for Prettier formatting.
+</ResponseField>
+
+<ResponseField name="sortImports" type="boolean | OptionsSortImports" default={true}>
+  Enables `@ianvs/prettier-plugin-sort-imports` for smart import organization.
+</ResponseField>
+
+<ResponseField name="tailwindcss" type="boolean | OptionsTailwindCss" default={false}>
+  Enables Tailwind CSS and ClassNames plugins for class sorting.
+</ResponseField>
+
+<ResponseField name="astro" type="boolean | OptionsAstro" default={false}>
+  Enables `prettier-plugin-astro` for Astro component formatting.
+</ResponseField>
+
+## Import Sorting
+
+When `sortImports` is enabled (default), imports are automatically organized by "distance" from the current file.
+
+### Sorting Order
+
+<Steps>
+  <Step title="User patterns">
+    Custom patterns you pass via `importOrder` are prioritized at the top.
+  </Step>
+
+  <Step title="URLs">
+    Remote modules (e.g., `https://esm.sh/...`).
+  </Step>
+
+  <Step title="Protocols">
+    Built-ins and protocol imports (`node:`, `bun:`, `jsr:`, `npm:`).
+  </Step>
+
+  <Step title="Packages">
+    Third-party modules (e.g., `react`, `lodash`).
+  </Step>
+
+  <Step title="Aliases">
+    Local aliases like `@/`, `#`, `~`, `$`, `%`.
+  </Step>
+
+  <Step title="Paths">
+    Relative and absolute file paths (excluding CSS).
+  </Step>
+
+  <Step title="CSS">
+    Style files are always pushed to the absolute bottom.
+  </Step>
+</Steps>
+
+### Custom Import Order
+
+Override the default import order:
+
+```js prettier.config.js
+import { zayne } from "@zayne-labs/prettier-config";
+
+export default zayne({
+  sortImports: {
+    importOrder: [
+      "^@core/(.*)$", // Core modules first
+      "^@app/(.*)$", // App modules
+      "^[./]", // Relative imports
+    ],
+  },
+});
+```
+
+### Disable Import Sorting
+
+```js prettier.config.js
+import { zayne } from "@zayne-labs/prettier-config";
+
+export default zayne({
+  sortImports: false,
+});
+```
+
+## Tailwind CSS Support
+
+The Tailwind integration combines three plugins for optimal class handling:
+
+- `prettier-plugin-tailwindcss`: Sorts classes
+- `prettier-plugin-classnames`: Multi-line formatting & attribute support
+- `prettier-plugin-merge`: Ensures plugins work together
+
+<Steps>
+  <Step title="Enable Tailwind support">
+    ```js prettier.config.js
+    import { zayne } from "@zayne-labs/prettier-config";
+
+    export default zayne({
+      tailwindcss: true,
+    });
+    ```
+  </Step>
+
+  <Step title="Install plugins">
+    When you run `prettier --write .`, you'll be prompted to install missing plugins:
+
+    ```bash
+    pnpm i -D prettier-plugin-tailwindcss prettier-plugin-classnames prettier-plugin-merge
+    ```
+  </Step>
+</Steps>
+
+### Tailwind CSS v4
+
+For Tailwind CSS v4 projects, specify your CSS entry point:
+
+```js prettier.config.js
+import { zayne } from "@zayne-labs/prettier-config";
+
+export default zayne({
+  tailwindcss: {
+    tailwindStylesheet: "./src/styles/tailwind.css",
+  },
+});
+```
+
+### Advanced Tailwind Options
+
+<Tabs>
+  <Tab title="Custom Attributes">
+    ```js prettier.config.js
+    import { zayne } from "@zayne-labs/prettier-config";
+
+    export default zayne({
+      tailwindcss: {
+        customAttributes: ["classNames", "classes", "styled"],
+      },
+    });
+    ```
+  </Tab>
+
+  <Tab title="Custom Functions">
+    ```js prettier.config.js
+    import { zayne } from "@zayne-labs/prettier-config";
+
+    export default zayne({
+      tailwindcss: {
+        customFunctions: ["cn", "tv", "tw", "clsx"],
+      },
+    });
+    ```
+  </Tab>
+
+  <Tab title="End Position">
+    ```js prettier.config.js
+    import { zayne } from "@zayne-labs/prettier-config";
+
+    export default zayne({
+      tailwindcss: {
+        endPosition: "absolute", // or 'relative'
+      },
+    });
+    ```
+  </Tab>
+
+  <Tab title="Syntax Transformation">
+    ```js prettier.config.js
+    import { zayne } from "@zayne-labs/prettier-config";
+
+    export default zayne({
+      tailwindcss: {
+        syntaxTransformation: true,
+      },
+    });
+    ```
+  </Tab>
+</Tabs>
+
+## Astro Support
+
+Enable Prettier formatting for Astro components:
+
+<Steps>
+  <Step title="Enable Astro support">
+    ```js prettier.config.js
+    import { zayne } from "@zayne-labs/prettier-config";
+
+    export default zayne({
+      astro: true,
+    });
+    ```
+  </Step>
+
+  <Step title="Install plugin">
+    ```bash
+    pnpm i -D prettier-plugin-astro
+    ```
+  </Step>
+</Steps>
+
+## Extending Configurations
+
+The factory accepts any number of extra configuration objects as subsequent arguments:
+
+```js prettier.config.js
+import { zayne } from "@zayne-labs/prettier-config";
+
+export default zayne(
+  {
+    tailwindcss: true,
+    sortImports: true,
+  },
+  // Extra config objects to merge
+  {
+    printWidth: 120,
+    semi: true,
+    singleQuote: false,
+    tabWidth: 4,
+  },
+  // Another config object
+  {
+    overrides: [
+      {
+        files: "*.md",
+        options: {
+          printWidth: 80,
+        },
+      },
+    ],
+  }
+);
+```
+
+## Plugin Auto-Installation
+
+This config won't bloat your `node_modules` with unused plugins. When you enable a feature, it checks if the required plugins are installed.
+
+<Note>
+  If plugins are missing, you'll be prompted to auto-install them when you run `prettier --write .`
+</Note>
+
+## Example Configurations
+
+<AccordionGroup>
+  <Accordion title="React with Tailwind">
+    ```js prettier.config.js
+    import { zayne } from "@zayne-labs/prettier-config";
+
+    export default zayne({
+      base: true,
+      sortImports: true,
+      tailwindcss: {
+        customFunctions: ["cn", "clsx"],
+      },
+    });
+    ```
+  </Accordion>
+
+  <Accordion title="Next.js with Custom Import Order">
+    ```js prettier.config.js
+    import { zayne } from "@zayne-labs/prettier-config";
+
+    export default zayne(
+      {
+        sortImports: {
+          importOrder: [
+            "^@/lib/(.*)$",
+            "^@/components/(.*)$",
+            "^@/app/(.*)$",
+            "^[./]",
+          ],
+        },
+        tailwindcss: true,
+      },
+      {
+        printWidth: 100,
+      }
+    );
+    ```
+  </Accordion>
+
+  <Accordion title="Astro with Tailwind v4">
+    ```js prettier.config.js
+    import { zayne } from "@zayne-labs/prettier-config";
+
+    export default zayne({
+      astro: true,
+      tailwindcss: {
+        tailwindStylesheet: "./src/styles/tailwind.css",
+      },
+    });
+    ```
+  </Accordion>
+
+  <Accordion title="Minimal Configuration">
+    ```js prettier.config.js
+    import { zayne } from "@zayne-labs/prettier-config";
+
+    export default zayne(
+      {
+        sortImports: false, // Disable import sorting
+      },
+      {
+        semi: false,
+        singleQuote: true,
+      }
+    );
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Package Scripts
+
+Add these scripts to your `package.json`:
+
+```json package.json
+{
+  "scripts": {
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  }
+}
+```
+
+## IDE Integration
+
+<Tabs>
+  <Tab title="VS Code">
+    Install the [Prettier extension](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) and add to `.vscode/settings.json`:
+
+    ```json
+    {
+      "editor.defaultFormatter": "esbenp.prettier-vscode",
+      "editor.formatOnSave": true
+    }
+    ```
+  </Tab>
+
+  <Tab title="Neovim">
+    Use [conform.nvim](https://github.com/stevearc/conform.nvim) or [none-ls](https://github.com/nvimtools/none-ls.nvim):
+
+    ```lua
+    require("conform").setup({
+      formatters_by_ft = {
+        javascript = { "prettier" },
+        typescript = { "prettier" },
+        javascriptreact = { "prettier" },
+        typescriptreact = { "prettier" },
+      },
+    })
+    ```
+  </Tab>
+</Tabs>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="ESLint Setup" icon="shield-check" href="/guides/eslint-setup">
+    Configure ESLint for comprehensive code quality
+  </Card>
+  <Card title="API Reference" icon="book" href="/api/prettier/factory">
+    View complete API documentation
+  </Card>
+</CardGroup>

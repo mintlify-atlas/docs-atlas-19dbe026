@@ -1,0 +1,590 @@
+---
+title: Installation
+description: Install and configure Zayne Labs config packages in your project
+---
+
+This guide covers the installation and basic setup for all three Zayne Labs config packages.
+
+## Prerequisites
+
+Before installing, ensure you have:
+
+- Node.js 18.x or higher (20.x+ for ESLint config)
+- A package manager: pnpm (recommended), npm, or yarn
+
+## Quick Start
+
+<Tabs>
+  <Tab title="ESLint Config">
+    The fastest way to get started with ESLint config is using the interactive CLI:
+
+    ```bash
+    pnpx @zayne-labs/eslint-config@latest
+    ```
+
+    The CLI will guide you through:
+    - Framework selection (React, Vue, Svelte, Astro)
+    - Additional integrations (TailwindCSS, TanStack, etc.)
+    - Automatic dependency installation
+  </Tab>
+
+  <Tab title="Prettier Config">
+    Install and configure Prettier in two simple steps:
+
+    ```bash
+    pnpm add -D @zayne-labs/prettier-config
+    ```
+
+    Then create `prettier.config.js`:
+
+    ```javascript
+    import { zayne } from "@zayne-labs/prettier-config";
+
+    export default zayne();
+    ```
+  </Tab>
+
+  <Tab title="TypeScript Config">
+    Install and extend in your tsconfig:
+
+    ```bash
+    pnpm add -D @zayne-labs/tsconfig
+    ```
+
+    Then in your `tsconfig.json`:
+
+    ```json
+    {
+      "extends": "@zayne-labs/tsconfig/bundler/dom/app"
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## Package Installation
+
+### ESLint Config
+
+<Steps>
+  <Step title="Install the package">
+    <CodeGroup>
+      ```bash pnpm
+      pnpm add -D eslint @zayne-labs/eslint-config
+      ```
+
+      ```bash npm
+      npm install --save-dev eslint @zayne-labs/eslint-config
+      ```
+
+      ```bash yarn
+      yarn add -D eslint @zayne-labs/eslint-config
+      ```
+    </CodeGroup>
+
+    <Note>
+      **Required peer dependency:** ESLint 9.x.x is required. Node.js 20.x or higher is also required.
+    </Note>
+  </Step>
+
+  <Step title="Create configuration file">
+    Create `eslint.config.js` in your project root:
+
+    ```javascript
+    import { zayne } from "@zayne-labs/eslint-config";
+
+    export default zayne();
+    ```
+
+    This zero-config setup works out of the box with TypeScript, JSX, JSON, YAML, TOML, Markdown, and more.
+  </Step>
+
+  <Step title="Add npm scripts">
+    Add these scripts to your `package.json`:
+
+    ```json
+    {
+      "scripts": {
+        "lint:eslint": "eslint .",
+        "lint:eslint-fix": "eslint . --fix"
+      }
+    }
+    ```
+  </Step>
+</Steps>
+
+#### Framework-Specific Dependencies
+
+Install additional peer dependencies based on your framework:
+
+<AccordionGroup>
+  <Accordion title="React">
+    ```bash
+    pnpm add -D @eslint-react/eslint-plugin eslint-plugin-react-hooks eslint-plugin-react-refresh
+    ```
+
+    React support is auto-detected in most cases, but you can enable it explicitly:
+
+    ```javascript
+    import { zayne } from "@zayne-labs/eslint-config";
+
+    export default zayne({
+      react: true,
+    });
+    ```
+  </Accordion>
+
+  <Accordion title="Vue">
+    ```bash
+    pnpm add -D eslint-plugin-vue vue-eslint-parser
+    ```
+
+    Enable in your config:
+
+    ```javascript
+    import { zayne } from "@zayne-labs/eslint-config";
+
+    export default zayne({
+      vue: true,
+    });
+    ```
+  </Accordion>
+
+  <Accordion title="Svelte">
+    ```bash
+    pnpm add -D eslint-plugin-svelte
+    ```
+
+    Enable in your config:
+
+    ```javascript
+    import { zayne } from "@zayne-labs/eslint-config";
+
+    export default zayne({
+      svelte: true,
+    });
+    ```
+  </Accordion>
+
+  <Accordion title="Astro">
+    ```bash
+    pnpm add -D eslint-plugin-astro astro-eslint-parser
+    ```
+
+    Enable in your config:
+
+    ```javascript
+    import { zayne } from "@zayne-labs/eslint-config";
+
+    export default zayne({
+      astro: true,
+    });
+    ```
+  </Accordion>
+
+  <Accordion title="Solid">
+    ```bash
+    pnpm add -D eslint-plugin-solid
+    ```
+
+    Enable in your config:
+
+    ```javascript
+    import { zayne } from "@zayne-labs/eslint-config";
+
+    export default zayne({
+      solid: true,
+    });
+    ```
+  </Accordion>
+</AccordionGroup>
+
+#### Optional Integrations
+
+<AccordionGroup>
+  <Accordion title="TailwindCSS">
+    For enhanced Tailwind class sorting and validation:
+
+    ```bash
+    pnpm add -D eslint-plugin-better-tailwindcss
+    ```
+
+    ```javascript
+    import { zayne } from "@zayne-labs/eslint-config";
+
+    export default zayne({
+      tailwindcssBetter: true,
+    });
+    ```
+  </Accordion>
+
+  <Accordion title="TanStack Query & Router">
+    ```bash
+    pnpm add -D @tanstack/eslint-plugin-query @tanstack/eslint-plugin-router
+    ```
+
+    ```javascript
+    import { zayne } from "@zayne-labs/eslint-config";
+
+    export default zayne({
+      tanstack: {
+        query: true,
+        router: true,
+      },
+    });
+    ```
+  </Accordion>
+
+  <Accordion title="React Native (Expo)">
+    ```bash
+    pnpm add -D eslint-config-expo
+    ```
+
+    ```javascript
+    import { zayne } from "@zayne-labs/eslint-config";
+
+    export default zayne({
+      expo: true,
+    });
+    ```
+  </Accordion>
+</AccordionGroup>
+
+### Prettier Config
+
+<Steps>
+  <Step title="Install the package">
+    <CodeGroup>
+      ```bash pnpm
+      pnpm add -D @zayne-labs/prettier-config prettier
+      ```
+
+      ```bash npm
+      npm install --save-dev @zayne-labs/prettier-config prettier
+      ```
+
+      ```bash yarn
+      yarn add -D @zayne-labs/prettier-config prettier
+      ```
+    </CodeGroup>
+
+    <Note>
+      **Required peer dependency:** Prettier 3.x.x is required.
+    </Note>
+  </Step>
+
+  <Step title="Install core plugins">
+    The import sorting plugin is required for the default configuration:
+
+    ```bash
+    pnpm add -D @ianvs/prettier-plugin-sort-imports
+    ```
+  </Step>
+
+  <Step title="Create configuration file">
+    Create `prettier.config.js` in your project root:
+
+    ```javascript
+    import { zayne } from "@zayne-labs/prettier-config";
+
+    export default zayne({
+      base: true,        // Enabled by default
+      sortImports: true, // Enabled by default
+    });
+    ```
+  </Step>
+</Steps>
+
+#### Optional Plugins
+
+<AccordionGroup>
+  <Accordion title="TailwindCSS & ClassNames">
+    For Tailwind class sorting and multi-line formatting:
+
+    ```bash
+    pnpm add -D prettier-plugin-tailwindcss prettier-plugin-classnames prettier-plugin-merge
+    ```
+
+    Enable in your config:
+
+    ```javascript
+    import { zayne } from "@zayne-labs/prettier-config";
+
+    export default zayne({
+      tailwindcss: true,
+    });
+    ```
+
+    Advanced configuration:
+
+    ```javascript
+    import { zayne } from "@zayne-labs/prettier-config";
+
+    export default zayne({
+      tailwindcss: {
+        customAttributes: ["classNames", "classes"],
+        customFunctions: ["cn", "tv", "tw"],
+        tailwindStylesheet: "./src/styles/tailwind.css",
+      },
+    });
+    ```
+  </Accordion>
+
+  <Accordion title="Astro">
+    For Astro component formatting:
+
+    ```bash
+    pnpm add -D prettier-plugin-astro
+    ```
+
+    Enable in your config:
+
+    ```javascript
+    import { zayne } from "@zayne-labs/prettier-config";
+
+    export default zayne({
+      astro: true,
+    });
+    ```
+  </Accordion>
+</AccordionGroup>
+
+<Note>
+**Auto-Installation:** When you enable a feature that requires additional plugins, the config will prompt you to install them automatically when you run `prettier --write .`
+</Note>
+
+### TypeScript Config
+
+<Steps>
+  <Step title="Install the package">
+    <CodeGroup>
+      ```bash pnpm
+      pnpm add -D @zayne-labs/tsconfig
+      ```
+
+      ```bash npm
+      npm install --save-dev @zayne-labs/tsconfig
+      ```
+
+      ```bash yarn
+      yarn add -D @zayne-labs/tsconfig
+      ```
+    </CodeGroup>
+  </Step>
+
+  <Step title="Choose your configuration">
+    Select the appropriate config based on your project type:
+
+    **Using a bundler (Vite, Webpack, etc.):**
+    ```json
+    {
+      "extends": "@zayne-labs/tsconfig/bundler/dom/app"
+    }
+    ```
+
+    **Using tsc to compile:**
+    ```json
+    {
+      "extends": "@zayne-labs/tsconfig/tsc/dom/app"
+    }
+    ```
+  </Step>
+
+  <Step title="Override compiler options (optional)">
+    You can extend the base config with your own options:
+
+    ```json
+    {
+      "extends": "@zayne-labs/tsconfig/bundler/dom/app",
+      "compilerOptions": {
+        "baseUrl": ".",
+        "paths": {
+          "@/*": ["./src/*"]
+        }
+      }
+    }
+    ```
+  </Step>
+</Steps>
+
+#### Available Configurations
+
+<Tabs>
+  <Tab title="Bundler Configs">
+    For projects using external bundlers (Vite, Webpack, Rollup, etc.):
+
+    ```json
+    // DOM-based applications
+    "@zayne-labs/tsconfig/bundler/dom/app"
+    "@zayne-labs/tsconfig/bundler/dom/library"
+    "@zayne-labs/tsconfig/bundler/dom/library-monorepo"
+
+    // Non-DOM environments (Node.js, etc.)
+    "@zayne-labs/tsconfig/bundler/no-dom/app"
+    "@zayne-labs/tsconfig/bundler/no-dom/library"
+    "@zayne-labs/tsconfig/bundler/no-dom/library-monorepo"
+
+    // Next.js
+    "@zayne-labs/tsconfig/bundler/next"
+    ```
+  </Tab>
+
+  <Tab title="TSC Configs">
+    For projects using `tsc` to compile TypeScript to JavaScript:
+
+    ```json
+    // DOM-based applications
+    "@zayne-labs/tsconfig/tsc/dom/app"
+    "@zayne-labs/tsconfig/tsc/dom/library"
+    "@zayne-labs/tsconfig/tsc/dom/library-monorepo"
+
+    // Non-DOM environments (Node.js, etc.)
+    "@zayne-labs/tsconfig/tsc/no-dom/app"
+    "@zayne-labs/tsconfig/tsc/no-dom/library"
+    "@zayne-labs/tsconfig/tsc/no-dom/library-monorepo"
+    ```
+  </Tab>
+
+  <Tab title="Base Config">
+    For custom configurations, start with the base:
+
+    ```json
+    "@zayne-labs/tsconfig/base"
+    ```
+  </Tab>
+</Tabs>
+
+## Interactive CLI Guide
+
+The ESLint config includes an interactive CLI that simplifies setup:
+
+<Steps>
+  <Step title="Run the CLI">
+    ```bash
+    pnpx @zayne-labs/eslint-config@latest
+    ```
+  </Step>
+
+  <Step title="Select your framework">
+    Choose from:
+    - React
+    - Vue
+    - Svelte
+    - Astro
+    - None (base configuration)
+  </Step>
+
+  <Step title="Choose integrations">
+    Select additional tools:
+    - TailwindCSS (better-tailwindcss plugin)
+    - TanStack Query
+    - TanStack Router
+  </Step>
+
+  <Step title="Install dependencies">
+    The CLI will automatically install all required peer dependencies.
+  </Step>
+
+  <Step title="Configuration file created">
+    The CLI generates `eslint.config.js` with your selected options.
+  </Step>
+</Steps>
+
+### CLI Options
+
+Skip prompts and use default values:
+
+```bash
+pnpx @zayne-labs/eslint-config@latest --yes
+```
+
+Specify framework template:
+
+```bash
+pnpx @zayne-labs/eslint-config@latest --template react
+```
+
+Add extra integrations:
+
+```bash
+pnpx @zayne-labs/eslint-config@latest --extra tailwindcss
+```
+
+## Verification
+
+After installation, verify your setup:
+
+<CodeGroup>
+  ```bash ESLint
+  pnpm lint:eslint
+  ```
+
+  ```bash Prettier
+  pnpm prettier --check .
+  ```
+
+  ```bash TypeScript
+  pnpm tsc --noEmit
+  ```
+</CodeGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="ESLint Setup" icon="shield-check" href="/guides/eslint-setup">
+    Complete guide for ESLint configuration and IDE setup
+  </Card>
+  <Card title="ESLint Customization" icon="sliders" href="/guides/eslint-customization">
+    Customize rules and advanced configuration options
+  </Card>
+  <Card title="Framework Support" icon="code" href="/guides/eslint-frameworks">
+    Configure ESLint for React, Vue, Svelte, and more
+  </Card>
+  <Card title="Prettier Setup" icon="paintbrush" href="/guides/prettier-setup">
+    Configure Prettier with smart import sorting
+  </Card>
+</CardGroup>
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="ESLint: Peer dependencies not installed">
+    If you see warnings about missing peer dependencies, install them manually:
+
+    ```bash
+    pnpm add -D <package-name>
+    ```
+
+    All peer dependencies are listed as optional, so you only need to install the ones for frameworks and integrations you're using.
+  </Accordion>
+
+  <Accordion title="Prettier: Plugin not found">
+    Ensure you've installed the required plugins for features you've enabled. For example, if `tailwindcss: true`, you need:
+
+    ```bash
+    pnpm add -D prettier-plugin-tailwindcss prettier-plugin-classnames prettier-plugin-merge
+    ```
+
+    The config will prompt you to install missing plugins when you run Prettier.
+  </Accordion>
+
+  <Accordion title="TypeScript: Cannot find module">
+    Make sure you're using the correct import path. All TypeScript configs are exported from specific paths:
+
+    ```json
+    {
+      "extends": "@zayne-labs/tsconfig/bundler/dom/app"
+    }
+    ```
+
+    Check the [Available Configurations](#available-configurations) section for the complete list.
+  </Accordion>
+
+  <Accordion title="Node.js version mismatch">
+    Each package has specific Node.js requirements:
+    - ESLint config: Node.js 20.x or higher
+    - Prettier config: Node.js 18.x or higher
+    - TypeScript config: Any recent Node.js version
+
+    Upgrade your Node.js version if you encounter compatibility issues.
+  </Accordion>
+</AccordionGroup>
